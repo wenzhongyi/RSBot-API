@@ -12,6 +12,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * A utility class for generating input to the canvas and retrieving information from the canvas.
  */
 public abstract class Input {
+
+	public static final int MINIMUM_SPEED = 1;
+	public static final int MAXIMUM_SPEED = 100;
+
 	protected final AtomicBoolean blocking, keyboard;
 	private final AbstractMouseSpline spline;
 	private final AtomicInteger speed;
@@ -20,7 +24,7 @@ public abstract class Input {
 		blocking = new AtomicBoolean(false);
 		keyboard = new AtomicBoolean(false);
 		this.spline = spline;
-		speed = new AtomicInteger(100);
+		speed = new AtomicInteger(translateToParisUnits(MINIMUM_SPEED));
 	}
 
 	/**
@@ -31,17 +35,46 @@ public abstract class Input {
 	public abstract Component getComponent();
 
 	/**
+	 * Takes a speed in paris units and returns the equivalent speed in percentage.
+	 *
+	 * @param s the speed in paris units.
+	 * @return the speed in percentage.
+	 */
+	private int translateFromParisUnits(int s) {
+		return (int) ((100 - speed.get()) / 0.9);
+	}
+
+	/**
+	 * Takes a percentage speed and returns the equivalent speed in paris units.
+	 *
+	 * @param s the speed in percentage.
+	 * @return the speed in paris units.
+	 */
+	private int translateToParisUnits(int s) {
+		return (int) Math.ceil(100 - (s * 0.9));
+	}
+
+	/**
+	 * Returns the current mouse speed.
+	 *
+	 * @return the current mouse speed.
+	 */
+	public int speed() {
+		return translateFromParisUnits(speed.get());
+	}
+
+	/**
 	 * Set the relative speed for mouse movements.
 	 * This is a sensitive function and should be used in exceptional circumstances for a short period of time only.
 	 *
-	 * @param s the new speed as a percentage, i.e. {@code 10} is 10x faster, {@code 25} is 4x as fast
-	 *          and {@code 100} is the full speed. Specifying {@code 0} will not change the speed but return the
-	 *          current value instead.
-	 * @return the speed, which can be different to the value requested
+	 * @param s the new speed.
+	 * @return the speed, which can be different to the value requested.
 	 */
 	public int speed(final int s) {
-		speed.set(Math.min(100, Math.max(10, s)));
-		return speed.get();
+		if (s < MINIMUM_SPEED || s > MAXIMUM_SPEED) SpeedException.forSpeed(s);
+		int speedInParisUnits = translateToParisUnits(s);
+		speed.set(speedInParisUnits);
+		return speed();
 	}
 
 	// TODO: remove boolean return values for input methods
