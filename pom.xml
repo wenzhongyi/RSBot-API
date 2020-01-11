@@ -34,7 +34,7 @@
     </distributionManagement>
 
     <properties>
-        <revision>8.0.7</revision>
+        <revision>8.0.8</revision>
         <changelist>-SNAPSHOT</changelist>
         <sha1/>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
