@@ -63,17 +63,17 @@ public class Equipment extends ItemQuery<Item> {
 	 * An enumeration of equipment slots.
 	 */
 	public enum Slot {
-		HEAD(0, 6),
-		CAPE(1, 7),
-		NECK(2, 8),
-		MAIN_HAND(3, 9),
-		TORSO(4, 10),
-		OFF_HAND(5, 11),
-		LEGS(7, 12),
-		HANDS(9, 13),
-		FEET(10, 14),
-		RING(12, 15),
-		QUIVER(13, 16);
+		HEAD(0, 14),
+		CAPE(1, 15),
+		NECK(2, 16),
+		MAIN_HAND(3, 17),
+		TORSO(4, 18),
+		OFF_HAND(5, 19),
+		LEGS(7, 20),
+		HANDS(9, 21),
+		FEET(10, 22),
+		RING(12, 23),
+		QUIVER(13, 24);
 		private final int index, component;
 
 		Slot(final int index, final int component) {
