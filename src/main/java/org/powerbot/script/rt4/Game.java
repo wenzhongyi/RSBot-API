@@ -1,4 +1,4 @@
-package org.powerbot.script.rt4;
+ipackage org.powerbot.script.rt4;
 
 import org.powerbot.bot.rt4.client.Client;
 import org.powerbot.script.Condition;
@@ -435,6 +435,7 @@ public class Game extends ClientAccessor {
 		MAGIC("Magic", 780, 1582, 1583, 1584),
 		CLAN_CHAT("Clan Chat", 904),
 		FRIENDS_LIST("Friends List", 782),
+		ACCOUNT_MANAGEMENT("Account Management", 1709),
 		IGNORED_LIST("Ignore List", 783),
 		LOGOUT("Logout", 907, 542),
 		OPTIONS("Options", 908),
