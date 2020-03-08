@@ -13,6 +13,10 @@ public final class Constants {
 	public static final int GAME_LOBBY = 25;
 	public static final int GAME_LOGGED = 30;
 
+	public static final int LOGIN_STATE_WELCOME = 0;
+	public static final int LOGIN_STATE_PVP_WARNING = 1;
+	public static final int LOGIN_STATE_ENTER_CREDENTIALS = 2;
+
 	public static final int BANK_WIDGET = 12;
 	public static final int BANK_ITEMS = 11;
 	public static final int BANK_SCROLLBAR = 12;
