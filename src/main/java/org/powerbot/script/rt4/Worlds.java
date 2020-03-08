@@ -128,10 +128,10 @@ public class Worlds extends AbstractQuery<Worlds, World, ClientContext> implemen
 	 * @return {@code true} if successfully opened, {@code false} otherwise.
 	 */
 	public boolean open() {
-		ctx.game.tab(Game.Tab.LOGOUT);
 		if (ctx.widgets.widget(WORLD_WIDGET).valid()) {
 			return true;
 		}
+		ctx.game.tab(Game.Tab.LOGOUT);
 		final Component c = component(LOGOUT_WIDGET, "World Switcher");
 		return c.valid() && c.click() && Condition.wait(new Condition.Check() {
 			public boolean poll() {
