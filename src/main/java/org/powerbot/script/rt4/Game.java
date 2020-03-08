@@ -191,6 +191,14 @@ public class Game extends ClientAccessor {
 	}
 
 	/**
+	 * @return The client's login state
+	 */
+	public int loginState() {
+		final Client c = ctx.client();
+		return c != null ? c.getLoginState() : -1;
+	}
+
+	/**
 	 * The current floor the client is at.
 	 *
 	 * @return the current floor the player is at, or -1 if the client has yet to be instantiated.
