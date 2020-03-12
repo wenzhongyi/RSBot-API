@@ -370,9 +370,9 @@ public class Bank extends ItemQuery<Item> {
 				Condition.sleep();
 				ctx.input.sendln(String.valueOf(amount));
 			}
-			Condition.wait(() -> ctx.inventory.select().id(item.id()).count(true) != inventoryCount);
+			Condition.wait(() -> ctx.inventory.select().count(true) != inventoryCount);
 		}
-		return ctx.inventory.select().id(item.id()).count(true) - inventoryCount;
+		return ctx.inventory.select().count(true) - inventoryCount;
 	}
 
 	private boolean scrollToItem(final Item item) {
