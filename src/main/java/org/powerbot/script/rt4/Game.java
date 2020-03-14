@@ -7,6 +7,8 @@ import org.powerbot.script.Tile;
 import java.applet.Applet;
 import java.awt.*;
 
+import static org.powerbot.script.rt4.Constants.*;
+
 /**
  * Game
  * A utility class used for interacting with game tabs, retrieving miscellaneous game values, and converting points to the viewport.
@@ -36,14 +38,14 @@ public class Game extends ClientAccessor {
 	 */
 	public boolean logout() {
 		if (ctx.game.tab(Tab.LOGOUT)) {
-			final Component c = ctx.widgets.widget(Constants.LOGOUT_BUTTON_WIDGET).component(Constants.LOGOUT_BUTTON_COMPONENT);
-			if (c.visible() && c.valid() && c.interact("Logout")) {
-				return Condition.wait(new Condition.Check() {
-					@Override
-					public boolean poll() {
-						return clientState() == Constants.GAME_LOGIN;
-					}
-				});
+			final Component logoutButton = ctx.widgets.component(LOGOUT_BUTTON_WIDGET, LOGOUT_BUTTON_COMPONENT);
+			if (logoutButton.valid() && logoutButton.visible()) {
+				return logoutButton.click("Logout") && Condition.wait(() -> clientState() == GAME_LOGIN);
+			}
+			ctx.components.select(true, WORLD_SELECTOR_WIDGET).texture(LOGOUT_DOOR_TEXTURE);
+			if (!ctx.components.isEmpty()) {
+				final Component door = ctx.components.poll();
+				return door.click("Logout") && Condition.wait(() -> clientState() == GAME_LOGIN);
 			}
 		}
 		return false;

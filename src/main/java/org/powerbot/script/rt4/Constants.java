@@ -57,6 +57,8 @@ public final class Constants {
 
 	public static final int LOGOUT_BUTTON_WIDGET = 182;
 	public static final int LOGOUT_BUTTON_COMPONENT = 12;
+	public static final int LOGOUT_DOOR_TEXTURE = 1191;
+	public static final int WORLD_SELECTOR_WIDGET = 69;
 
 	public static final int INVENTORY_WIDGET = 149;
 	public static final int INVENTORY_ITEMS = 0;
