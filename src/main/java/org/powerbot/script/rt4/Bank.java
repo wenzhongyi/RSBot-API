@@ -591,15 +591,12 @@ public class Bank extends ItemQuery<Item> {
 	 * @return {@link Amount#PLACEHOLDER} if no amount is specified. If not, it returns the respective selected withdraw mode quantity.
 	 */
 	public Amount withdrawModeQuantity() {
-		final int withdrawModeNumber = ctx.varpbits.varpbit(Constants.BANK_QUANTITY);
-		switch(withdrawModeNumber) {
-			case Constants.BANK_WITHDRAW_MODE_ONE: return Amount.ONE;
-			case Constants.BANK_WITHDRAW_MODE_FIVE: return Amount.FIVE;
-			case Constants.BANK_WITHDRAW_MODE_TEN: return Amount.TEN;
-			case Constants.BANK_WITHDRAW_MODE_X: return Amount.X;
-			case Constants.BANK_WITHDRAW_MODE_ALL: return Amount.ALL;
-			default: return Amount.PLACEHOLDER;
+		final Amount[] amounts = {Amount.ONE, Amount.FIVE, Amount.TEN, Amount.X, Amount.ALL};
+		final int withdrawModeNumber = ctx.varpbits.varpbit(Constants.BANK_QUANTITY, 2, 0x7);
+		if (withdrawModeNumber >= 0 && withdrawModeNumber < amounts.length) {
+			return amounts[withdrawModeNumber];
 		}
+		return Amount.PLACEHOLDER;
 	}
 
 	/**
