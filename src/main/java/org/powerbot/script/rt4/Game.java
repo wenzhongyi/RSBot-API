@@ -121,10 +121,11 @@ public class Game extends ClientAccessor {
 	}
 
 	private int openedTabIndexOffset(final Tab tab) {
-		if (bottomLineTabs()) {
+		if (resizable() && bottomLineTabs()) {
 			switch (tab) {
 			case LOGOUT:
 				return 1;
+			case ACCOUNT_MANAGEMENT:
 			case FRIENDS_LIST:
 			case IGNORED_LIST:
 			case CLAN_CHAT:
