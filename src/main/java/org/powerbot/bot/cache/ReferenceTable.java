@@ -1,5 +1,6 @@
 package org.powerbot.bot.cache;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 public class ReferenceTable {
@@ -53,7 +54,7 @@ public class ReferenceTable {
 	private Entry[] entries;
 
 	public ReferenceTable(final ByteBuffer buffer) {
-		buffer.position(5);
+		((Buffer) buffer).position(5);
 		entryCount = buffer.get() & 0xff;
 		entries = new Entry[entryCount];
 
