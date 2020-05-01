@@ -49,7 +49,6 @@ public class Equipment extends ItemQuery<Item> {
 			return nil();
 		}
 		return new Item(ctx, c, v ? c.itemId() : data[index], v ? c.itemStackSize() : 1);
-		return new Item(ctx, c, c.itemId(), c.itemStackSize());
 	}
 	/**
 	 * {@inheritDoc}
