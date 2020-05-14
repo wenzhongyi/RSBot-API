@@ -19,8 +19,8 @@ public final class Constants {
 	public static final int LOGIN_STATE_DISCONNECTED = 24;
 
 	public static final int BANK_WIDGET = 12;
-	public static final int BANK_ITEMS = 11;
-	public static final int BANK_SCROLLBAR = 12;
+	public static final int BANK_ITEMS = 12;
+	public static final int BANK_SCROLLBAR = 13;
 	public static final int BANK_MASTER = 2;
 	public static final int BANK_CLOSE = 11;
 	public static final int BANK_ITEM = 21;
