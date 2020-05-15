@@ -2,6 +2,7 @@ package org.powerbot.bot;
 
 import org.junit.Test;
 import org.powerbot.script.*;
+import org.powerbot.script.rt4.Constants;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -22,5 +23,10 @@ public class TestBase {
 		} catch (final UnknownHostException e) {
 			fail();
 		}
+	}
+
+	@Test
+	public void constants() {
+		assertEquals(Constants.GAME_LOGIN, 10);
 	}
 }

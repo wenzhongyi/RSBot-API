@@ -1,14 +1,28 @@
 package org.powerbot.script.rt4;
 
-import org.powerbot.script.*;
+import org.powerbot.script.Tile;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Objects;
+import java.util.Properties;
 
 /**
  * Constants
  * A utility class holding all the game constants for rt4.
  */
 public final class Constants {
+	private static final Properties CONSTANTS;
 
-	public static final int GAME_LOGIN = 10;
+	static {
+		CONSTANTS = new Properties();
+		try {
+			CONSTANTS.load(new InputStreamReader(Objects.requireNonNull(Constants.class.getClassLoader().getResourceAsStream("constants.properties"))));
+		} catch (final IOException ignored) {
+		}
+	}
+
+	public static final int GAME_LOGIN = Integer.parseInt(CONSTANTS.getProperty("game.login"));
 	public static final int GAME_LOGGING = 20;
 	public static final int GAME_LOBBY = 25;
 	public static final int GAME_LOGGED = 30;
