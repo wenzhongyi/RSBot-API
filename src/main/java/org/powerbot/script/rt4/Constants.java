@@ -15,27 +15,29 @@ import java.util.logging.Logger;
  * A utility class holding all the game constants for rt4.
  */
 public final class Constants {
-	private static final Properties CONSTANTS;
+	private static final Properties REMOTE, LOCAL;
 
 	static {
-		CONSTANTS = new Properties();
+		REMOTE = new Properties();
+		LOCAL = new Properties();
 		try {
-			CONSTANTS.load(new URL(
+			REMOTE.load(new URL(
 				"https://raw.githubusercontent.com/powerbot/RSBot-API/master/src/main/resources/constants.properties"
 			).openStream());
 		} catch (final IOException remote) {
 			Logger.getLogger("Exception").log(Level.SEVERE, "Unable to load remote Constants", remote);
-			try {
-				CONSTANTS.load(new InputStreamReader(Objects.requireNonNull(Constants.class.getClassLoader().getResourceAsStream("constants.properties"))));
-			} catch (final IOException local) {
-				Logger.getLogger("Exception").log(Level.SEVERE, "Unable to load local Constants", local);
-				//we should probably bail out here since nothing will work if we don't have constants
-			}
+		}
+
+		try {
+			LOCAL.load(new InputStreamReader(Objects.requireNonNull(Constants.class.getClassLoader().getResourceAsStream("constants.properties"))));
+		} catch (final IOException local) {
+			Logger.getLogger("Exception").log(Level.SEVERE, "Unable to load local Constants", local);
+			//we should probably bail out here since nothing will work if we don't have constants
 		}
 	}
 
 	private static int getInt(final String property) {
-		return Integer.parseInt(CONSTANTS.getProperty(property));
+		return Integer.parseInt(REMOTE.getProperty(property, LOCAL.getProperty(property)));
 	}
 
 	public static final int GAME_LOGIN = getInt("GAME_LOGIN");
