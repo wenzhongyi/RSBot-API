@@ -1,6 +1,5 @@
 package org.powerbot.script.rt4;
 
-import com.sun.javafx.binding.Logging;
 import org.powerbot.script.Tile;
 
 import java.io.IOException;
@@ -8,6 +7,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Constants
@@ -23,11 +24,11 @@ public final class Constants {
 				"https://raw.githubusercontent.com/powerbot/RSBot-API/master/src/main/resources/constants.properties"
 			).openStream());
 		} catch (final IOException remote) {
-			Logging.getLogger().severe("Unable to load remote Constants", remote);
+			Logger.getLogger("Exception").log(Level.SEVERE, "Unable to load remote Constants", remote);
 			try {
 				CONSTANTS.load(new InputStreamReader(Objects.requireNonNull(Constants.class.getClassLoader().getResourceAsStream("constants.properties"))));
 			} catch (final IOException local) {
-				Logging.getLogger().severe("Unable to load local Constants", local);
+				Logger.getLogger("Exception").log(Level.SEVERE, "Unable to load local Constants", local);
 				//we should probably bail out here since nothing will work if we don't have constants
 			}
 		}
