@@ -1,7 +1,5 @@
 package org.powerbot.script;
 
-import java.awt.Component;
-
 /**
  * SpeedException
  * A class responsible for conveying any speed related edge cases.
