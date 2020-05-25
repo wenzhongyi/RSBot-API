@@ -158,7 +158,7 @@ public class LocalPath extends Path {
 		tile = end;
 		Tile start = ctx.players.local().tile();
 		final Tile base = ctx.game.mapOffset();
-		if (base == Tile.NIL || start == Tile.NIL || end == Tile.NIL) {
+		if (base == Tile.NIL || start == Tile.NIL) {
 			return false;
 		}
 		start = start.derive(-base.x(), -base.y());

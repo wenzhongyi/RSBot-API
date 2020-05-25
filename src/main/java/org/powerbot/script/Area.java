@@ -22,7 +22,7 @@ public class Area {
 	}
 
 	public Area(final Tile... tiles) {
-		if (tiles.length < 0) {
+		if (tiles.length == 0) {
 			throw new IllegalArgumentException("tiles.length < 0");
 		}
 		this.polygon = new Polygon();
