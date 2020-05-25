@@ -95,7 +95,9 @@ public abstract class AbstractScript<C extends ClientContext> implements Script 
 
 		dir = new File(new File(System.getProperty("java.io.tmpdir"), ContextClassLoader.class.getAnnotation(Script.Manifest.class).name()), id);
 		if (!dir.isDirectory()) {
-			dir.mkdir();
+			if (!dir.mkdirs()) {
+				log.warning("Failed to make directory: " + dir.getAbsolutePath());
+			}
 		}
 		final File ini = new File(dir, "settings.1.ini");
 		settings = new Properties();
@@ -110,11 +112,15 @@ public abstract class AbstractScript<C extends ClientContext> implements Script 
 		exec[State.STOP.ordinal()].add(() -> {
 			if (settings.isEmpty()) {
 				if (ini.isFile()) {
-					ini.delete();
+					if (!ini.delete()) {
+						log.warning("Failed to delete " + ini.getAbsolutePath());
+					}
 				}
 			} else {
 				if (!dir.isDirectory()) {
-					dir.mkdirs();
+					if (!dir.mkdirs()) {
+						log.warning("Failed to make directory: " + dir.getAbsolutePath());
+					}
 				}
 
 				try (final OutputStream out = new FileOutputStream(ini)) {
@@ -162,7 +168,9 @@ public abstract class AbstractScript<C extends ClientContext> implements Script 
 	 */
 	public File getStorageDirectory() {
 		if (!dir.isDirectory()) {
-			dir.mkdirs();
+			if (!dir.mkdirs()) {
+				log.warning("Failed to make directory: " + dir.getAbsolutePath());
+			}
 		}
 		return dir;
 	}
@@ -183,7 +191,7 @@ public abstract class AbstractScript<C extends ClientContext> implements Script 
 	 */
 	public String getName() {
 		final Manifest manifest = getManifest();
-		return manifest == null || manifest.name() == null ? "" : manifest.name();
+		return manifest == null ? "" : manifest.name();
 	}
 
 	/**
@@ -193,7 +201,7 @@ public abstract class AbstractScript<C extends ClientContext> implements Script 
 	 */
 	public String getDescription() {
 		final Manifest m = getManifest();
-		return m == null || m.description() == null ? "" : m.description();
+		return m == null ? "" : m.description();
 	}
 
 	/**
@@ -203,11 +211,10 @@ public abstract class AbstractScript<C extends ClientContext> implements Script 
 	 */
 	public Map<String, String> getProperties() {
 		final Manifest m = getManifest();
-		final String s;
-		if (m == null || (s = m.properties()) == null) {
+		if (m == null) {
 			return Collections.emptyMap();
 		}
-		return ScriptBundle.parseProperties(s);
+		return ScriptBundle.parseProperties(m.properties());
 	}
 
 	/**
@@ -225,7 +232,9 @@ public abstract class AbstractScript<C extends ClientContext> implements Script 
 
 		final File p = f.getParentFile();
 		if (p != null) {
-			p.mkdirs();
+			if (!p.mkdirs()) {
+				log.warning("Failed to make directory: " + p.getAbsolutePath());
+			}
 		}
 
 		return f;
@@ -292,7 +301,9 @@ public abstract class AbstractScript<C extends ClientContext> implements Script 
 		try {
 			return ImageIO.read(f);
 		} catch (final IOException ignored) {
-			f.delete();
+			if (!f.delete()) {
+				log.warning("Failed to delete temporary image:" + f.getAbsolutePath());
+			}
 			return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 		}
 	}
