@@ -60,7 +60,7 @@ public abstract class AbstractScript<C extends ClientContext> implements Script 
 		if (o[0] != null && o[0] != o[1]) {
 			try {
 				final Constructor<?> ctor = o[0].getDeclaredConstructor(o[1]);
-				final boolean a = ctor.isAccessible();
+				final boolean a = ctor.canAccess(null);
 				ctor.setAccessible(true);
 				@SuppressWarnings("unchecked")
 				final C ctx = (C) ctor.newInstance(x);
