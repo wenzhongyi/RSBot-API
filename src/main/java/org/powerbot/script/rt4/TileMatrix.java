@@ -56,6 +56,7 @@ public final class TileMatrix extends Interactive implements InteractiveEntity {
 	 * 
 	 * @return value of {@link #bounds()}
 	 */
+	@Deprecated
 	public Polygon getBounds() {
 		return bounds();
 	}

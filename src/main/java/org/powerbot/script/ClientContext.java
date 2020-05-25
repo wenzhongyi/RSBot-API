@@ -125,6 +125,7 @@ public abstract class ClientContext<C extends Client> {
 	 * @deprecated use {@link org.powerbot.script.Script.Controller#script()}
 	 */
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	public final <T extends AbstractScript<? extends ClientContext<C>>> T script() {
 		return (T) controller.script();
 	}
