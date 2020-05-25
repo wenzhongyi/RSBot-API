@@ -140,10 +140,9 @@ public class CacheObjectConfig {
 			}
 			case 41: {
 				final int len = stream.getUByte();
-				final short[] arr1 = new short[len], arr2 = new short[len];
 				for (int i = 0; i < len; i++) {
-					arr1[i] = (short) stream.getUShort();
-					arr2[i] = (short) stream.getUShort();
+					stream.getUShort();
+					stream.getUShort();
 				}
 				break;
 			}
