@@ -50,6 +50,19 @@ public class Player extends Actor {
 	}
 
 	@Override
+	public int healthPercent() {
+		if (!valid()) {
+			return -1;
+		}
+
+		if (player == ctx.client().getPlayer()) {
+			return ctx.combat.healthPercent();
+		}
+
+		return super.healthPercent();
+	}
+
+	@Override
 	public boolean valid() {
 		final Client client = ctx.client();
 		if (client == null || player == null) {
