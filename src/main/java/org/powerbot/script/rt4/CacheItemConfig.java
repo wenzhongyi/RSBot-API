@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class CacheItemConfig implements Validatable {
 	public final int index;
 	private final AbstractCacheWorker worker;
-	private final JagexStream stream;
+	private final JagexBufferStream stream;
 	public String name = "";
 	public String shiftAction = "";
 	public boolean tradeable;
@@ -49,7 +49,7 @@ public class CacheItemConfig implements Validatable {
 	private CacheItemConfig(final AbstractCacheWorker worker, final Block.Sector sector, final int index) {
 		this.index = index;
 		this.worker = worker;
-		this.stream = new JagexStream(sector.getPayload());
+		this.stream = new JagexBufferStream(sector.getPayload());
 		read();
 		inherit(this);
 	}

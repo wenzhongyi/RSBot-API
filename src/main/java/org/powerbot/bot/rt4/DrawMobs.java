@@ -20,10 +20,12 @@ public class DrawMobs extends ClientAccessor implements PaintListener {
 		}
 		final FontMetrics metrics = render.getFontMetrics();
 		for (final Npc npc : ctx.npcs.select()) {
-			final Point location = npc.centerPoint();
+			final Point location = npc.modelCenterPoint();
 			if (location.x == -1 || location.y == -1) {
 				continue;
 			}
+			render.setColor(Color.GREEN);
+			npc.drawModel(render);
 			render.setColor(Color.red);
 			render.fillRect((int) location.getX() - 1, (int) location.getY() - 1, 2, 2);
 			String s = npc.name() + " (" + npc.combatLevel() + " [" + npc.health() + "]) - " + npc.id();

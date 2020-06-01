@@ -82,4 +82,11 @@ public class Player extends Actor {
 		return String.format("%s[name=%s/level=%d/team=%d]",
 				Player.class.getName(), name(), combatLevel(), team());
 	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int[] modelIds() {
+		return null;
+	}
 }

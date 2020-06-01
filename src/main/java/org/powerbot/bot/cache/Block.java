@@ -11,7 +11,7 @@ public class Block {
 		private final int index, identifier;
 		private final byte[] payload;
 
-		Sector(final int index, final int identifier, final byte[] payload) {
+		public Sector(final int index, final int identifier, final byte[] payload) {
 			this.index = index;
 			this.identifier = identifier;
 			this.payload = payload;
@@ -37,7 +37,12 @@ public class Block {
 	}
 
 	private void init() {
-		final JagexStream stream = new JagexStream(block);
+		if (entry.getChildCount() == 1) {
+			sectors = new Block.Sector[]{new Block.Sector(0, -1, block)};
+			return;
+		}
+
+		final JagexBufferStream stream = new JagexBufferStream(block);
 		stream.seek(stream.getLength() - 1);
 		final int parts = stream.getUByte();
 		final int start = stream.getLength() - 1 - 4 * parts * entry.getChildCount();
@@ -73,6 +78,14 @@ public class Block {
 		for (int i = 0; i < sectors.length; i++) {
 			this.sectors[i] = new Sector(i, -1, sectors[i]);
 		}
+	}
+
+	public byte[] getBlock() {
+		return block;
+	}
+
+	public Sector[] getSectors() {
+		return sectors;
 	}
 
 	public Sector getSector(final int id) {
