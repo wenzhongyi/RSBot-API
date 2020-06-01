@@ -11,7 +11,10 @@ import java.awt.*;
  * Actor
  * A base class of all characters within Runescape.
  */
-public abstract class Actor extends Interactive implements InteractiveEntity, Nameable, Validatable {
+public abstract class Actor extends Interactive implements InteractiveEntity, Nameable, Validatable , Modelable {
+
+	private Model model;
+
 	Actor(final ClientContext ctx) {
 		super(ctx);
 		bounds(new int[]{-32, 32, -192, 0, -32, 32});
@@ -348,4 +351,31 @@ public abstract class Actor extends Interactive implements InteractiveEntity, Na
 		}
 		return data;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int localX() {
+		return getActor().getX();
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int localY() {
+		return getActor().getZ();
+	}
+
+	/**
+	 * The orientation of the model.
+	 *
+	 * @return The model orientation.
+	 */
+	@Override
+	public int modelOrientation() {
+		final org.powerbot.bot.rt4.client.Actor actor = getActor();
+		return actor != null ? actor.getOrientation() : -1;
+	}
+
 }

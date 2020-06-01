@@ -2,6 +2,7 @@ package org.powerbot.script.rt4;
 
 import org.powerbot.bot.cache.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  */
 public class CacheNpcConfig {
 	public final int index;
-	private final JagexStream stream;
+	private final JagexBufferStream stream;
 	public String name = "null";
 	public int[] modelIds, materialPointers, d;
 	public int size = 552360651;
@@ -43,7 +44,7 @@ public class CacheNpcConfig {
 
 	public CacheNpcConfig(final Block.Sector sector, final int index) {
 		this.index = index;
-		stream = new JagexStream(sector.getPayload());
+		stream = new JagexBufferStream(sector.getPayload());
 		read();
 	}
 

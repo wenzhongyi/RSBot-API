@@ -43,6 +43,9 @@ public class DrawObjects extends ClientAccessor implements PaintListener {
 				continue;
 			}
 
+			render.setColor(Color.GREEN);
+			object.drawModel(render);
+
 			render.setColor(Color.black);
 			render.fillRect(p.x - 1, p.y - 1, 2, 2);
 

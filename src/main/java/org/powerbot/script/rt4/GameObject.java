@@ -11,7 +11,7 @@ import java.awt.*;
 /**
  * GameObject
  */
-public class GameObject extends Interactive implements Nameable, InteractiveEntity, Identifiable, Validatable, Actionable {
+public class GameObject extends Interactive implements Nameable, InteractiveEntity, Identifiable, Validatable, Actionable, Modelable {
 	public static final Color TARGET_COLOR = new Color(0, 255, 0, 20);
 	private static final int[] lookup;
 
@@ -245,6 +245,40 @@ public class GameObject extends Interactive implements Nameable, InteractiveEnti
 	@Override
 	public boolean equals(final Object o) {
 		return o instanceof GameObject && hashCode() == o.hashCode();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int localX() {
+		return object.getX();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int localY() {
+		return object.getZ();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int modelOrientation() {
+		return 0;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int[] modelIds() {
+		final CacheObjectConfig c =  CacheObjectConfig.load(ctx.bot().getCacheWorker(), id());
+
+		return c != null ? c.meshId : null;
 	}
 
 	public enum Type {
