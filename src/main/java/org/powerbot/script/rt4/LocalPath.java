@@ -21,6 +21,10 @@ public class LocalPath extends Path {
 		super(ctx);
 		this.destination = destination;
 	}
+	
+	public TilePath getTilePath() {
+		return this.tilePath;
+	}
 
 	static Graph getGraph(final ClientContext ctx) {
 		final Client client = ctx.client();
