@@ -11,105 +11,48 @@ import java.lang.reflect.Method;
  * @see GameObject
  */
 public class BasicObject {
-	protected final ReflectProxy object;
+	protected final org.powerbot.bot.rt4.client.BasicObject object;
 
-	public BasicObject(final ReflectProxy object) {
+	public BasicObject(final org.powerbot.bot.rt4.client.BasicObject object) {
 		this.object = object;
 	}
 
 	boolean isComplex() {
-		final Class<?> c = object.getClass();
-		try {
-			return c.getDeclaredMethod("getX") != null;
-		} catch (final NoSuchMethodException ignored) {
-		}
-		return false;
+		return getX() != -1;
 	}
 
 	public int getUid() {
-		final Class<?> c = object.getClass();
-		try {
-			final Method m = c.getMethod("getUid");
-			final Object v = m.invoke(object);
-			if (v instanceof Integer) {
-				return (int) v;
-			}
-			final long l = (long) v;
-			final int x = (int) l & 0x7f, z = (int) ((l >> 7) & 0x7f), i = (int) (l >> 17);
-			return i << 14 | z << 7 | x;
-		} catch (final Exception ignored) {
-		}
-		return -1;
+		final long l = object.getUid();
+		final int x = (int) l & 0x7f, z = (int) ((l >> 7) & 0x7f), i = (int) (l >> 17);
+		return i << 14 | z << 7 | x;
 	}
 
 	public int getMeta() {
-		final Class<?> c = object.getClass();
-		try {
-			final Method m = c.getMethod("getMeta");
-			return (Integer) m.invoke(object);
-		} catch (final Exception ignored) {
-		}
-		return -1;
+		return object.getMeta();
 	}
 
 	public int getX() {
-		final Class<?> c = object.getClass();
-		try {
-			final Method m = c.getMethod("getX");
-			return (Integer) m.invoke(object);
-		} catch (final Exception ignored) {
-		}
-		return -1;
+		return object.getX();
 	}
 
 	public int getZ() {
-		final Class<?> c = object.getClass();
-		try {
-			final Method m = c.getMethod("getZ");
-			return (Integer) m.invoke(object);
-		} catch (final Exception ignored) {
-		}
-		return -1;
+		return object.getZ();
 	}
 
 	public int getX1() {
-		final Class<?> c = object.getClass();
-		try {
-			final Method m = c.getMethod("getX1");
-			return (Integer) m.invoke(object);
-		} catch (final Exception ignored) {
-		}
-		return -1;
+		return object.getX1();
 	}
 
 	public int getY1() {
-		final Class<?> c = object.getClass();
-		try {
-			final Method m = c.getMethod("getY1");
-			return (Integer) m.invoke(object);
-		} catch (final Exception ignored) {
-		}
-		return -1;
+		return object.getY1();
 	}
 
 	public int getX2() {
-		final Class<?> c = object.getClass();
-		try {
-			final Method m = c.getMethod("getX2");
-			return (Integer) m.invoke(object);
-		} catch (final Exception ignored) {
-		}
-		return -1;
+		return object.getX2();
 	}
 
 	public int getY2() {
-		final Class<?> c = object.getClass();
-		try {
-			final Method m = c.getMethod("getY2");
-			return (Integer) m.invoke(object);
-		} catch (final Exception ignored) {
-		}
-		return -1;
+		return object.getY2();
 	}
 
 	@Override

@@ -40,7 +40,7 @@ public class Objects extends BasicQuery<GameObject> {
 
 	public List<GameObject> get(final Locatable l, int radius) {
 		radius = Math.min(radius, 110);
-		final List<GameObject> r = new CopyOnWriteArrayList<>();
+		final List<GameObject> r = new ArrayList<>();
 		final Client client = ctx.client();
 		if (client == null) {
 			return r;
@@ -70,35 +70,36 @@ public class Objects extends BasicQuery<GameObject> {
 				if (tile.isNull()) {
 					continue;
 				}
-				final int len = Math.max(0, tile.getGameObjectLength());
-				final ReflectProxy[] fo = {tile.getBoundaryObject(), tile.getFloorObject(), tile.getWallObject()};
-				final ReflectProxy[] arr = new ReflectProxy[3 + len];
-				System.arraycopy(fo, 0, arr, 0, 3);
-				final org.powerbot.bot.rt4.client.GameObject[] interactive = tile.getGameObjects();
-				System.arraycopy(interactive, 0, arr, 3, Math.min(len, interactive.length));
 
-				for (final ReflectProxy p : arr) {
-					final BasicObject o = new BasicObject(p);
-					if (!o.object.isNull()) {
-						final int t = o.getMeta() & 0x3f;
-						final GameObject.Type type;
-						if (t == 0 || t == 1 || t == 9) {
-							type = GameObject.Type.BOUNDARY;
-						} else if (t == 2 || t == 3 || t == 4 || t == 5 || t == 6 || t == 7 || t == 8) {
-							type = GameObject.Type.WALL_DECORATION;
-						} else if (t == 10 || t == 11) {
-							type = GameObject.Type.INTERACTIVE;
-						} else if (t == 22) {
-							type = GameObject.Type.FLOOR_DECORATION;
-						} else {
-							type = GameObject.Type.UNKNOWN;
-						}
-						set.add(new GameObject(ctx, o, type));
+				for (final org.powerbot.bot.rt4.client.BasicObject obj :
+					new org.powerbot.bot.rt4.client.BasicObject[]{tile.getBoundaryObject(), tile.getFloorObject(), tile.getWallObject()}) {
+					if (!obj.isNull()) {
+						set.add(new GameObject(ctx, new BasicObject(obj), getType(obj)));
+					}
+				}
+				for (final org.powerbot.bot.rt4.client.GameObject gameObject : tile.getGameObjects()) {
+					if (!gameObject.isNull()) {
+						set.add(new GameObject(ctx, new BasicObject(gameObject), getType(gameObject)));
 					}
 				}
 			}
 		}
 		return new ArrayList<>(set);
+	}
+
+	private GameObject.Type getType(org.powerbot.bot.rt4.client.BasicObject o) {
+		final int t = o.getMeta() & 0x3f;
+		if (t == 0 || t == 1 || t == 9) {
+			return GameObject.Type.BOUNDARY;
+		} else if (t == 2 || t == 3 || t == 4 || t == 5 || t == 6 || t == 7 || t == 8) {
+			return GameObject.Type.WALL_DECORATION;
+		} else if (t == 10 || t == 11) {
+			return GameObject.Type.INTERACTIVE;
+		} else if (t == 22) {
+			return GameObject.Type.FLOOR_DECORATION;
+		}
+
+		return GameObject.Type.UNKNOWN;
 	}
 
 	@Override
