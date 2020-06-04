@@ -21,6 +21,8 @@ public class Model {
 
 	private int[] originalVerticesX;
 	private int[] originalVerticesZ;
+	private int[] originalIndicesX;
+	private int[] originalIndicesZ;
 
 	public Model(final ClientContext ctx, final int[] verticesX, final int[] verticesY, final int[] verticesZ,
 				 final int[] indicesX, final int[] indicesY, final int[] indicesZ) {
@@ -34,6 +36,8 @@ public class Model {
 
 		this.originalVerticesX = verticesX.clone();
 		this.originalVerticesZ = verticesZ.clone();
+		this.originalIndicesX = indicesX.clone();
+		this.originalIndicesZ = indicesZ.clone();
 	}
 
 	public static Model fromCacheModel(final ClientContext ctx, final CacheModelConfig model) {
@@ -156,6 +160,31 @@ public class Model {
 			}
 			return 1;
 		}).collect(Collectors.toList()).get(0);
+	}
+
+	public void mirrorModel() {
+		for(int i = 0; i < this.originalVerticesZ.length; ++i) {
+			this.verticesZ[i] = -this.originalVerticesZ[i];
+		}
+
+		for(int i = 0; i < this.originalIndicesX.length; ++i) {
+			final int oldX = this.originalIndicesX[i];
+			this.indicesX[i] = this.originalIndicesZ[i];
+			this.indicesZ[i] = oldX;
+		}
+	}
+
+	public void rotate(final int num) {
+		for (int n = 0; n < num; n++) {
+			for (int i = 0; i < originalVerticesX.length; ++i) {
+				final int oldX = originalVerticesX[i];
+				originalVerticesX[i] = originalVerticesZ[i];
+				originalVerticesZ[i] = -oldX;
+			}
+		}
+
+		this.verticesX = originalVerticesX;
+		this.verticesZ = originalVerticesZ;
 	}
 
 

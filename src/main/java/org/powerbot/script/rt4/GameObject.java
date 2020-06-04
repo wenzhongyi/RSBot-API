@@ -74,6 +74,7 @@ public class GameObject extends Interactive implements Nameable, InteractiveEnti
 		if (c == null) {
 			return id;
 		}
+
 		if (c.stageOperationId != -1) {
 			final Cache cache = client.getVarbitCache();
 			final Varbit varBit = new Varbit(object.object.reflector, HashTable.lookup(cache.getTable(), c.stageOperationId, Varbit.class));
@@ -283,5 +284,10 @@ public class GameObject extends Interactive implements Nameable, InteractiveEnti
 
 	public enum Type {
 		INTERACTIVE, BOUNDARY, WALL_DECORATION, FLOOR_DECORATION, UNKNOWN
+	}
+
+	@Override
+	public void transformModel(final Model model) {
+		model.rotate(orientation());
 	}
 }
