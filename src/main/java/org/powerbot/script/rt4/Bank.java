@@ -479,13 +479,15 @@ public class Bank extends ItemQuery<Item> {
 
 	private String bankActionString(String action, final Item item, final int count, final int amount) {
 		action = action + "-";
-		if (amount == Amount.ALL_BUT_ONE.getValue()) {
+		if (amount == 1 || amount == 5 || amount == 10) {
+			action += amount;
+		} else if (amount == Amount.ALL_BUT_ONE.getValue() && count > 1) {
 			action += "All-but-1";
 		} else if (amount == Amount.X.getValue()) {
 			action += withdrawXAmount();
 		} else if (amount == Amount.ALL.getValue() || count <= amount) {
 			action += "All";
-		} else if (amount == 1 || amount == 5 || amount == 10 || itemContainsAmountAction(item, amount)) {
+		} else if (itemContainsAmountAction(item, amount)) {
 			action += amount;
 		} else {
 			action += "X";
