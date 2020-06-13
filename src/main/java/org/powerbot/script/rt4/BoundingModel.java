@@ -4,6 +4,7 @@ import org.powerbot.script.*;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * BoundingModel
@@ -230,5 +231,22 @@ public abstract class BoundingModel extends ClientAccessor {
 			}
 		}
 		return Arrays.copyOf(model, faces);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		final BoundingModel that = (BoundingModel) o;
+		return Objects.equals(start, that.start) && Objects.equals(end, that.end);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(start, end);
 	}
 }
