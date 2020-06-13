@@ -4,6 +4,8 @@ import org.powerbot.script.Random;
 import org.powerbot.script.*;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.powerbot.script.rt4.Constants.*;
 
@@ -204,6 +206,18 @@ public class Bank extends ItemQuery<Item> {
 
 	/**
 	 * Withdraws an item with the provided name and amount.
+	 *
+	 * @param id      the id of the item
+	 * @param amount  the amount to withdraw
+	 * @param waitFor the condition to wait for
+	 * @return the return value of {@code waitFor} if items were attempted to be withdrawn. False otherwise.
+	 */
+	public boolean withdraw(final int id, final Amount amount, final Callable<Boolean> waitFor) {
+		return withdraw(id, amount.getValue(), waitFor);
+	}
+
+	/**
+	 * Withdraws an item with the provided name and amount.
 	 * If multiple items of the same name are present, the first one is chosen.
 	 *
 	 * @param name   the name of the item
@@ -212,6 +226,18 @@ public class Bank extends ItemQuery<Item> {
 	 */
 	public boolean withdraw(final String name, final Amount amount) {
 		return withdraw(select().name(name).poll(), amount.getValue());
+	}
+
+	/**
+	 * Withdraws an item with the provided name and amount.
+	 * If multiple items of the same name are present, the first one is chosen.
+	 *
+	 * @param name   the name of the item
+	 * @param amount the amount to withdraw
+	 * @return {@code true} if the item was withdrawn, does not determine if amount was matched; otherwise, {@code false}
+	 */
+	public boolean withdraw(final String name, final Amount amount, final Callable<Boolean> waitFor) {
+		return withdraw(select().name(name).poll(), amount.getValue(), waitFor);
 	}
 
 	/**
@@ -227,6 +253,18 @@ public class Bank extends ItemQuery<Item> {
 	}
 
 	/**
+	 * Withdraws an item with the provided name and amount.
+	 * If multiple items match the filter, the first one is chosen.
+	 *
+	 * @param filter the filter to apply to the items in the bank
+	 * @param amount the amount to withdraw
+	 * @return {@code true} if the item was withdrawn, does not determine if amount was matched; otherwise, {@code false}
+	 */
+	public boolean withdraw(final Filter<Item> filter, final Amount amount, final Callable<Boolean> waitFor) {
+		return withdraw(select().select(filter).poll(), amount.getValue(), waitFor);
+	}
+
+	/**
 	 * Withdraws an item with the provided id and amount.
 	 *
 	 * @param id     the id of the item
@@ -235,6 +273,18 @@ public class Bank extends ItemQuery<Item> {
 	 */
 	public boolean withdraw(final int id, final int amount) {
 		return withdraw(select().id(id).poll(), amount);
+	}
+
+	/**
+	 * Withdraws an item with the provided name and amount.
+	 *
+	 * @param id      the id of the item
+	 * @param amount  the amount to withdraw
+	 * @param waitFor the condition to wait for
+	 * @return the return value of {@code waitFor} if items were attempted to be withdrawn. False otherwise.
+	 */
+	public boolean withdraw(final int id, final int amount, final Callable<Boolean> waitFor) {
+		return withdraw(select().id(id).poll(), amount, waitFor);
 	}
 
 	/**
@@ -251,6 +301,19 @@ public class Bank extends ItemQuery<Item> {
 
 	/**
 	 * Withdraws an item with the provided name and amount.
+	 * If multiple items of the same name are present, the first one is chosen.
+	 *
+	 * @param name    the filter to apply to the items in the bank
+	 * @param amount  the amount to withdraw
+	 * @param waitFor the condition to wait for
+	 * @return the return value of {@code waitFor} if items were attempted to be withdrawn. False otherwise.
+	 */
+	public boolean withdraw(final String name, final int amount, final Callable<Boolean> waitFor) {
+		return withdraw(select().name(name).poll(), amount, waitFor);
+	}
+
+	/**
+	 * Withdraws an item with the provided name and amount.
 	 * If multiple items match the filter, the first one is chosen.
 	 *
 	 * @param filter the filter to apply to the items in the bank
@@ -262,6 +325,19 @@ public class Bank extends ItemQuery<Item> {
 	}
 
 	/**
+	 * Withdraws an item with the provided name and amount.
+	 * If multiple items match the filter, the first one is chosen.
+	 *
+	 * @param filter  the filter to apply to the items in the bank
+	 * @param amount  the amount to withdraw
+	 * @param waitFor the condition to wait for
+	 * @return the return value of {@code waitFor} if items were attempted to be withdrawn. False otherwise.
+	 */
+	public boolean withdraw(final Filter<Item> filter, final int amount, final Callable<Boolean> waitFor) {
+		return withdraw(select().select(filter).poll(), amount, waitFor);
+	}
+
+	/**
 	 * Withdraws an item with the provided item and amount.
 	 *
 	 * @param item   the item instance
@@ -270,6 +346,39 @@ public class Bank extends ItemQuery<Item> {
 	 */
 	public boolean withdraw(final Item item, final int amount) {
 		return withdrawAmount(item, amount) > 0;
+	}
+
+	/**
+	 * Withdraws the specified amount of the specified item and waits for the specified condition to be true.
+	 *
+	 * @param item    the item to withdraw
+	 * @param amount  the amount to withdraw
+	 * @param waitFor the condition to wait for
+	 * @return the return value of {@code waitFor} if items were attempted to be withdrawn. False otherwise.
+	 */
+	public boolean withdraw(final Item item, final int amount, final Callable<Boolean> waitFor) {
+		if (!opened() || !item.valid() || amount < Amount.values()[0].getValue() || !scrollToItem(item)) {
+			return false;
+		} else if (!item.component().visible()) {
+			currentTab(0);
+		}
+		final int bankCount = select().id(item.id()).count(true);
+
+		final String action = amount == Amount.PLACEHOLDER.getValue()
+			? "Placeholder"
+			: bankActionString("Withdraw", item, bankCount, amount);
+		if ((item.contains(ctx.input.getLocation()) && ctx.menu.click(c -> c.action.equalsIgnoreCase(action)))
+			|| item.interact(c -> c.action.equalsIgnoreCase(action))) {
+			if (action.endsWith("X")) {
+				if (!Condition.wait(ctx.chat::pendingInput)) {
+					return false;
+				}
+				Condition.sleep();
+				ctx.input.sendln(String.valueOf(amount));
+			}
+			return waitFor == null || Condition.wait(waitFor);
+		}
+		return false;
 	}
 
 	/**
@@ -350,29 +459,13 @@ public class Bank extends ItemQuery<Item> {
 	 * @return the amount successfully withdrawn
 	 */
 	public int withdrawAmount(final Item item, final int amount) {
-		if (!opened() || !item.valid() || amount < Amount.values()[0].getValue() || !scrollToItem(item)) {
-			return 0;
-		} else if (!item.component().visible()) {
-			currentTab(0);
-		}
-		final int bankCount = select().id(item.id()).count(true);
-		final int inventoryCount = ctx.inventory.select().id(item.id()).count(true);
-		final String action = amount == Amount.PLACEHOLDER.getValue()
-				? "Placeholder"
-				: bankActionString("Withdraw", item, bankCount, amount);
-		if ((item.contains(ctx.input.getLocation())
-				&& ctx.menu.click(c -> c.action.equalsIgnoreCase(action)))
-				|| item.interact(c -> c.action.equalsIgnoreCase(action))) {
-			if (action.endsWith("X")) {
-				if (!Condition.wait(ctx.chat::pendingInput)) {
-					return 0;
-				}
-				Condition.sleep();
-				ctx.input.sendln(String.valueOf(amount));
-			}
-			Condition.wait(() -> ctx.inventory.select().count(true) != inventoryCount);
-		}
-		return ctx.inventory.select().count(true) - inventoryCount;
+		final int inventoryCount = ctx.inventory.select().count(true);
+		final AtomicInteger count = new AtomicInteger(0);
+		withdraw(item, amount, () -> {
+			count.set(ctx.inventory.select().count(true) - inventoryCount);
+			return count.get() > 0;
+		});
+		return count.get();
 	}
 
 	private boolean scrollToItem(final Item item) {
