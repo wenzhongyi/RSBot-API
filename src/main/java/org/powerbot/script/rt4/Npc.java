@@ -122,11 +122,9 @@ public class Npc extends Actor implements Identifiable, Actionable {
 		return c != null ? c.colors2 : new short[]{};
 	}
 
-
 	@Override
 	public int[] modelIds() {
 		final CacheNpcConfig c = CacheNpcConfig.load(ctx.bot().getCacheWorker(), id());
-
 		return c != null ? c.modelIds : null;
 	}
 

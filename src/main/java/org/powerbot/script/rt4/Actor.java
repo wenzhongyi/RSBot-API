@@ -13,11 +13,21 @@ import java.awt.*;
  */
 public abstract class Actor extends Interactive implements InteractiveEntity, Nameable, Validatable , Modelable {
 
-	private Model model;
+	private final BoundingModel defaultBounds = new BoundingModel(ctx, -32, 32, -192, 0, -32, 32) {
+		@Override
+		public int x() {
+			return relative() >> 16;
+		}
+
+		@Override
+		public int z() {
+			return relative() & 0xffff;
+		}
+	};
 
 	Actor(final ClientContext ctx) {
 		super(ctx);
-		bounds(new int[]{-32, 32, -192, 0, -32, 32});
+		boundingModel.set(defaultBounds);
 	}
 
 	@Override
@@ -25,14 +35,12 @@ public abstract class Actor extends Interactive implements InteractiveEntity, Na
 		boundingModel.set(new BoundingModel(ctx, x1, x2, y1, y2, z1, z2) {
 			@Override
 			public int x() {
-				final int r = relative();
-				return r >> 16;
+				return relative() >> 16;
 			}
 
 			@Override
 			public int z() {
-				final int r = relative();
-				return r & 0xffff;
+				return relative() & 0xffff;
 			}
 		});
 	}
@@ -230,28 +238,55 @@ public abstract class Actor extends Interactive implements InteractiveEntity, Na
 	@Override
 	public Point nextPoint() {
 		final org.powerbot.bot.rt4.client.Actor actor = getActor();
+		if (actor == null) {
+			return new Point(-1, -1);
+		}
+		// Non-default custom bounds take priority
 		final BoundingModel model2 = boundingModel.get();
-		if (actor != null && model2 != null) {
+		if (model2 != null && !model2.equals(defaultBounds)) {
 			return model2.nextPoint();
 		}
-		return new Point(-1, -1);
+		final Model model = model();
+		if (model != null) {
+			return model.nextPoint(localX(), localY(), modelOrientation());
+		}
+		return model2 != null ? model2.nextPoint() : new Point(-1, -1);
 	}
 
 	@Override
 	public Point centerPoint() {
 		final org.powerbot.bot.rt4.client.Actor actor = getActor();
+		if (actor == null) {
+			return new Point(-1, -1);
+		}
+		// Non-default custom bounds take priority
 		final BoundingModel model2 = boundingModel.get();
-		if (actor != null && model2 != null) {
+		if (model2 != null && !model2.equals(defaultBounds)) {
 			return model2.centerPoint();
 		}
-		return new Point(-1, -1);
+		final Model model = model();
+		if (model != null) {
+			return model.centerPoint(localX(), localY(), modelOrientation());
+		}
+		return model2 != null ? model2.centerPoint() : new Point(-1, -1);
 	}
 
 	@Override
 	public boolean contains(final Point point) {
 		final org.powerbot.bot.rt4.client.Actor actor = getActor();
+		if (actor == null) {
+			return false;
+		}
+		// Non-default custom bounds take priority
 		final BoundingModel model2 = boundingModel.get();
-		return actor != null && model2 != null && model2.contains(point);
+		if (model2 != null && !model2.equals(defaultBounds)) {
+			return model2.contains(point);
+		}
+		final Model model = model();
+		if (model != null) {
+			return model.contains(point, localX(), localY(), modelOrientation());
+		}
+		return model2 != null && model2.contains(point);
 	}
 
 	@Override
