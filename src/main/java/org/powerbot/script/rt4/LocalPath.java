@@ -65,7 +65,7 @@ public class LocalPath extends Path {
 
 	static Node[] follow(Node target) {
 		final List<Node> nodes = new LinkedList<>();
-		if (Double.isInfinite(target.g)) {
+		if (target.g == Integer.MAX_VALUE) {
 			return new Node[0];
 		}
 		while (target != null) {
