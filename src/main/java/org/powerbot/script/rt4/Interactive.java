@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Interactive
  */
 public abstract class Interactive extends ClientAccessor implements org.powerbot.script.Interactive {
+	public static final Point NIL_POINT = new Point(-1, -1);
 	protected AtomicReference<BoundingModel> boundingModel;
 
 	public Interactive(final ClientContext ctx) {

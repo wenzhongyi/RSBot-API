@@ -105,7 +105,7 @@ public class Model {
 
 	public Point nextPoint(final int localX, final int localY, final int orientation) {
 		final List<Polygon> polygons = polygons(localX, localY, orientation);
-		if (polygons.isEmpty()) {
+		if (polygons == null || polygons.isEmpty()) {
 			return new Point(-1, -1);
 		}
 
@@ -128,7 +128,8 @@ public class Model {
 	}
 
 	public boolean contains(final Point point, final int localX, final int localY, final int orientation) {
-		return polygons(localX, localY, orientation).stream().anyMatch(polygon -> polygon.contains(point));
+		final List<Polygon> polygons = polygons(localX, localY, orientation);
+		return polygons != null && !polygons.isEmpty() && polygons.stream().anyMatch(polygon -> polygon.contains(point));
 	}
 
 	private void setOrientation(final int orientation) {

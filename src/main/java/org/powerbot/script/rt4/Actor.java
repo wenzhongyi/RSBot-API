@@ -239,7 +239,7 @@ public abstract class Actor extends Interactive implements InteractiveEntity, Na
 	public Point nextPoint() {
 		final org.powerbot.bot.rt4.client.Actor actor = getActor();
 		if (actor == null) {
-			return new Point(-1, -1);
+			return NIL_POINT;
 		}
 		// Non-default custom bounds take priority
 		final BoundingModel model2 = boundingModel.get();
@@ -247,17 +247,21 @@ public abstract class Actor extends Interactive implements InteractiveEntity, Na
 			return model2.nextPoint();
 		}
 		final Model model = model();
-		if (model != null) {
-			return model.nextPoint(localX(), localY(), modelOrientation());
+		if (model == null) {
+			return model2 != null ? model2.nextPoint() : NIL_POINT;
 		}
-		return model2 != null ? model2.nextPoint() : new Point(-1, -1);
+		final Point next = model.nextPoint(localX(), localY(), modelOrientation());
+		if (!next.equals(NIL_POINT)) {
+			return next;
+		}
+		return model2 != null ? model2.nextPoint() : NIL_POINT;
 	}
 
 	@Override
 	public Point centerPoint() {
 		final org.powerbot.bot.rt4.client.Actor actor = getActor();
 		if (actor == null) {
-			return new Point(-1, -1);
+			return NIL_POINT;
 		}
 		// Non-default custom bounds take priority
 		final BoundingModel model2 = boundingModel.get();
@@ -265,10 +269,14 @@ public abstract class Actor extends Interactive implements InteractiveEntity, Na
 			return model2.centerPoint();
 		}
 		final Model model = model();
-		if (model != null) {
-			return model.centerPoint(localX(), localY(), modelOrientation());
+		if (model == null) {
+			return model2 != null ? model2.centerPoint() : NIL_POINT;
 		}
-		return model2 != null ? model2.centerPoint() : new Point(-1, -1);
+		final Point center = model.centerPoint(localX(), localY(), modelOrientation());
+		if (!center.equals(NIL_POINT)) {
+			return center;
+		}
+		return model2 != null ? model2.centerPoint() : NIL_POINT;
 	}
 
 	@Override
@@ -283,10 +291,10 @@ public abstract class Actor extends Interactive implements InteractiveEntity, Na
 			return model2.contains(point);
 		}
 		final Model model = model();
-		if (model != null) {
-			return model.contains(point, localX(), localY(), modelOrientation());
+		if (model == null || model.nextPoint(localX(), localY(), modelOrientation()).equals(NIL_POINT)) {
+			return model2 != null && model2.contains(point);
 		}
-		return model2 != null && model2.contains(point);
+		return model.contains(point, localX(), localY(), modelOrientation());
 	}
 
 	@Override
