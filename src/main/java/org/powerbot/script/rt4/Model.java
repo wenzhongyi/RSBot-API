@@ -34,7 +34,10 @@ public class Model {
 		this.indicesX = indicesX;
 		this.indicesY = indicesY;
 		this.indicesZ = indicesZ;
+		save();
+	}
 
+	private void save() {
 		this.originalVerticesX = verticesX.clone();
 		this.originalVerticesZ = verticesZ.clone();
 		this.originalIndicesX = indicesX.clone();
@@ -201,6 +204,24 @@ public class Model {
 			this.indicesX[i] = this.originalIndicesZ[i];
 			this.indicesZ[i] = oldX;
 		}
+	}
+
+	public void scale(final int scaleX, final int scaleY, final int scaleZ) {
+		for (int i = 0; i < this.verticesX.length; ++i) {
+			this.verticesX[i] = scaleX * this.verticesX[i] / 128;
+			this.verticesY[i] = scaleY * this.verticesY[i] / 128;
+			this.verticesZ[i] = scaleZ * this.verticesZ[i] / 128;
+		}
+		save();
+	}
+
+	public void offsetVertices(int xOff, int yOff, int zOff) {
+		for (int i = 0; i < verticesX.length; i++) {
+			verticesX[i] += xOff;
+			verticesY[i] += yOff;
+			verticesZ[i] += zOff;
+		}
+		save();
 	}
 
 	public void rotate(final int num) {

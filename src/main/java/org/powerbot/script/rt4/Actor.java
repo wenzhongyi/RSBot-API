@@ -11,7 +11,7 @@ import java.awt.*;
  * Actor
  * A base class of all characters within Runescape.
  */
-public abstract class Actor extends Interactive implements InteractiveEntity, Nameable, Validatable , Modelable {
+public abstract class Actor extends Interactive implements InteractiveEntity, Nameable, Validatable, Modelable {
 
 	private final BoundingModel defaultBounds = new BoundingModel(ctx, -32, 32, -192, 0, -32, 32) {
 		@Override
