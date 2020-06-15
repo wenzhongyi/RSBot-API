@@ -1,6 +1,5 @@
 package org.powerbot.script.rt4;
 
-import org.powerbot.script.Random;
 import org.powerbot.script.Vector3;
 
 import java.awt.*;
@@ -68,7 +67,7 @@ public class Model {
 		final int[] vertY = verticesY();
 		final int[] vertZ = verticesZ();
 
-		final List<Polygon> polys = new ArrayList<>();
+		final java.util.List<Polygon> polys = new ArrayList<>();
 		final boolean resizable = ctx.game.resizable();
 		for (int i = 0; i < indX.length; i++) {
 			if (i >= indY.length && i >= indZ.length) {
@@ -95,40 +94,12 @@ public class Model {
 	 * @param localX the local x of the entity
 	 * @param localY the local y of the entity
 	 * @param orientation the orientation of the entity
-	 * @param g graphics object to draw with
+	 * @param graphics graphics object to draw with
 	 */
-	public void draw(final int localX, final int localY, final int orientation, final Graphics g) {
+	public void draw(final int localX, final int localY, final int orientation, final Graphics graphics) {
 		for (final Polygon polygon : polygons(localX, localY, orientation)) {
-			g.drawPolygon(polygon);
+			graphics.drawPolygon(polygon);
 		}
-	}
-
-	public Point nextPoint(final int localX, final int localY, final int orientation) {
-		final List<Polygon> polygons = polygons(localX, localY, orientation);
-		if (polygons.isEmpty()) {
-			return new Point(-1, -1);
-		}
-
-		// Select random triangle of model
-		final Polygon triangle = polygons.get(Random.nextInt(0, polygons.size() - 1));
-		final Point[] pts = {
-			new Point(triangle.xpoints[0], triangle.ypoints[0]),
-			new Point(triangle.xpoints[1], triangle.ypoints[1]),
-			new Point(triangle.xpoints[2], triangle.ypoints[2])
-		};
-
-		// Compute random point within triangle
-		final double r1 = Math.random(), r2 = Math.random();
-		final double sqrtR1 = Math.sqrt(r1);
-		final double sqrtR1R2 = sqrtR1 * r2;
-		final double x = (1 - sqrtR1) * pts[0].x + (sqrtR1 * (1 - r2)) * pts[1].x + sqrtR1R2 * pts[2].x;
-		final double y = (1 - sqrtR1) * pts[0].y + (sqrtR1 * (1 - r2)) * pts[1].y + sqrtR1R2 * pts[2].y;
-
-		return new Point((int) x, (int) y);
-	}
-
-	public boolean contains(final Point point, final int localX, final int localY, final int orientation) {
-		return polygons(localX, localY, orientation).stream().anyMatch(polygon -> polygon.contains(point));
 	}
 
 	private void setOrientation(final int orientation) {
@@ -137,6 +108,7 @@ public class Model {
 		for (int i = 0; i < originalVerticesX.length; ++i) {
 			verticesX[i] = originalVerticesX[i] * cos + originalVerticesZ[i] * sin >> 16;
 			verticesZ[i] = originalVerticesZ[i] * cos - originalVerticesX[i] * sin >> 16;
+
 		}
 	}
 
