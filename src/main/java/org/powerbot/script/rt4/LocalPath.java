@@ -2,7 +2,6 @@ package org.powerbot.script.rt4;
 
 import org.powerbot.bot.rt4.client.Client;
 import org.powerbot.bot.rt4.client.*;
-import org.powerbot.script.Random;
 import org.powerbot.script.Tile;
 import org.powerbot.script.*;
 
@@ -13,6 +12,7 @@ import java.util.*;
  * LocalPath
  */
 public class LocalPath extends Path {
+
 	private final Locatable destination;
 	private TilePath tilePath;
 	private Tile tile;
@@ -21,7 +21,7 @@ public class LocalPath extends Path {
 		super(ctx);
 		this.destination = destination;
 	}
-	
+
 	public TilePath getTilePath() {
 		return this.tilePath;
 	}
@@ -38,86 +38,34 @@ public class LocalPath extends Path {
 			return null;
 		}
 		final int[][] arr = map.getFlags();
-		final double[][] costs = getCosts(ctx, arr.length, arr.length);
-		return arr != null ? new Graph(arr, costs, map.getOffsetX(), map.getOffsetY()) : null;
+		return arr != null ? new Graph(arr, map.getOffsetX(), map.getOffsetY()) : null;
 	}
 
-	static double[][] getCosts(final ClientContext ctx, final int w, final int h) {
-		final Client client = ctx.client();
-		final Landscape landscape = client.getLandscape();
-		final org.powerbot.bot.rt4.client.Tile[][][] tiles;
-		final int floor = client.getFloor();
-		final org.powerbot.bot.rt4.client.Tile[][] rows;
-		if (landscape == null || (tiles = landscape.getTiles()) == null ||
-				floor < 0 || floor > tiles.length || (rows = tiles[floor]) == null) {
-			return new double[0][0];
-		}
-		final double[][] arr = new double[w][h];
-		for (int x = 0; x < Math.min(w, rows.length); x++) {
-			final org.powerbot.bot.rt4.client.Tile[] row = rows[x];
-			if (row == null) {
-				continue;
-			}
-			final int h2 = row.length;
-			for (int y = 0; y < Math.min(h, h2); y++) {
-				final org.powerbot.bot.rt4.client.Tile tile = row[y];
-				if (tile == null) {
-					continue;
-				}
+	static Node bfs(final Graph graph, final Node source, final Node target) {
+		Queue<Node> queue = new ArrayDeque<>();
+		queue.offer(source);
+		source.g = 0;
 
-				if (tile.getGameObjectLength() > 0 ||
-						tile.getBoundaryObject() != null || tile.getWallObject() != null) {
-					for (int dx = Math.max(0, x - 1); dx <= Math.min(w - 1, x + 1); dx++) {
-						for (int dy = Math.max(0, y - 1); dy <= Math.min(h - 1, y + 1); dy++) {
-							arr[dx][dy] += Random.nextDouble();
-						}
-					}
-				}
-			}
-		}
-		return arr;
-	}
-
-	static void dijkstra(final Graph graph, final Node source, final Node target) {
-		source.g = 0d;
-		source.f = 0d;
-
-		final Queue<Node> queue = new PriorityQueue<>(8, Comparator.comparingDouble(o -> o.f));
-
-		final double sqrt2 = Math.sqrt(2);
-
-		queue.add(source);
-		source.opened = true;
 		while (!queue.isEmpty()) {
-			final Node node = queue.poll();
-			node.closed = true;
-			if (node.equals(target)) {
-				break;
+			Node current = queue.poll();
+			if (current.equals(target)) {
+				return current;
 			}
-			for (final Node neighbor : graph.neighbors(node)) {
-				if (neighbor.closed) {
-					continue;
-				}
-				final double ng = node.g + ((neighbor.x - node.x == 0 || neighbor.y - node.y == 0) ? 1d : sqrt2);
-
-				if (!neighbor.opened || ng < neighbor.g) {
-					neighbor.g = ng + graph.getNodeCost(node.x, node.y);
-					neighbor.h = 0;//no heuristic
-					neighbor.f = neighbor.g + neighbor.h;
-					neighbor.parent = node;
-
-					if (!neighbor.opened) {
-						queue.offer(neighbor);
-						neighbor.opened = true;
-					}
+			List<Node> neighbors = graph.neighbors(current);
+			for (Node neighbor : neighbors) {
+				if (neighbor.g == Integer.MAX_VALUE) {
+					neighbor.g = current.g + 1;
+					neighbor.parent = current;
+					queue.offer(neighbor);
 				}
 			}
 		}
+		return null;
 	}
 
 	static Node[] follow(Node target) {
 		final List<Node> nodes = new LinkedList<>();
-		if (Double.isInfinite(target.g)) {
+		if (target.g == Integer.MAX_VALUE) {
 			return new Node[0];
 		}
 		while (target != null) {
@@ -172,9 +120,9 @@ public class LocalPath extends Path {
 		final Node[] path;
 		final Node nodeStart, nodeStop;
 		if (graph != null &&
-				(nodeStart = graph.getNode(start.x(), start.y())) != null &&
-				(nodeStop = graph.getNode(end.x(), end.y())) != null) {
-			dijkstra(graph, nodeStart, nodeStop);
+			(nodeStart = graph.getNode(start.x(), start.y())) != null &&
+			(nodeStop = graph.getNode(end.x(), end.y())) != null) {
+			bfs(graph, nodeStart, nodeStop);
 			path = follow(nodeStop);
 		} else {
 			path = new Node[0];
@@ -191,124 +139,111 @@ public class LocalPath extends Path {
 	}
 
 	static final class Graph {
+
 		private final int offX, offY;
-		private final double[][] costs;
 		private final Node[][] nodes;
 		private final int width, height;
+		private final int[][] flags;
 
-		private Graph(final int[][] flags, final double[][] costs, final int offX, final int offY) {
+		private Graph(final int[][] flags, final int offX, final int offY) {
+			this.flags = flags;
 			this.offX = offX;
 			this.offY = offY;
 			nodes = new Node[flags.length][];
-			this.costs = costs;
 			width = flags.length;
 			int height = flags.length;
 			for (int x = 0; x < flags.length; x++) {
 				final int[] arr = flags[x];
 				nodes[x] = new Node[arr.length];
 				height = Math.min(height, arr.length);
-				for (int y = 0; y < arr.length; y++) {
-					nodes[x][y] = new Node(x, y, flags[x][y]);
-				}
 			}
 			this.height = height;
 		}
 
-		private double getNodeCost(final int x, final int y) {
-			final int ox = x + offX, oy = y + offY;
-			if (ox >= 0 && oy >= 0 && ox < costs.length && oy < costs[ox].length) {
-				return costs[ox][oy];
-			}
-			return 0d;
-		}
-
 		Node getNode(final int x, final int y) {
 			final int ox = x - offX, oy = y - offY;
-			if (ox >= 0 && oy >= 0 && ox < nodes.length && oy < nodes[ox].length) {
-				return nodes[ox][oy];
+			if (ox < 0 || oy < 0 || ox >= nodes.length || oy >= nodes[ox].length) {
+				return new Node(-1, -1, BLOCKED);
 			}
-			return null;
+			// Lazily initialize graph
+			final Node node = nodes[ox][oy];
+			if (node == null) {
+				return nodes[ox][oy] = new Node(x, y, flags[ox][oy]);
+			}
+			return node;
 		}
 
 		private List<Node> neighbors(final Node node) {
 			final List<Node> list = new ArrayList<>(8);
 			final int curr_x = node.x;
 			final int curr_y = node.y;
-			final int BLOCKED = OBJECT_TILE | OBJECT_BLOCK | DECORATION_BLOCK;
 			if (curr_x < 0 || curr_y < 0 ||
-					curr_x >= width || curr_y >= height) {
+				curr_x >= width || curr_y >= height) {
 				return list;
 			}
 			if (curr_y > 0 &&
-					(nodes[curr_x][curr_y].flag & WALL_SOUTH) == 0 &&
-					(nodes[curr_x][curr_y - 1].flag & BLOCKED) == 0) {
-				list.add(nodes[curr_x][curr_y - 1]);
+				(getNode(curr_x, curr_y).flag & WALL_SOUTH) == 0 &&
+				(getNode(curr_x, curr_y - 1).flag & BLOCKED) == 0) {
+				list.add(getNode(curr_x, curr_y - 1));
 			}
 			if (curr_x > 0 &&
-					(nodes[curr_x][curr_y].flag & WALL_WEST) == 0 &&
-					(nodes[curr_x - 1][curr_y].flag & BLOCKED) == 0) {
-				list.add(nodes[curr_x - 1][curr_y]);
+				(getNode(curr_x, curr_y).flag & WALL_WEST) == 0 &&
+				(getNode(curr_x - 1, curr_y).flag & BLOCKED) == 0) {
+				list.add(getNode(curr_x - 1, curr_y));
 			}
 			if (curr_y < height - 1 &&
-					(nodes[curr_x][curr_y].flag & WALL_NORTH) == 0 &&
-					(nodes[curr_x][curr_y + 1].flag & BLOCKED) == 0) {
-				list.add(nodes[curr_x][curr_y + 1]);
+				(getNode(curr_x, curr_y).flag & WALL_NORTH) == 0 &&
+				(getNode(curr_x, curr_y + 1).flag & BLOCKED) == 0) {
+				list.add(getNode(curr_x, curr_y + 1));
 			}
 			if (curr_x < width - 1 &&
-					(nodes[curr_x][curr_y].flag & WALL_EAST) == 0 &&
-					(nodes[curr_x + 1][curr_y].flag & BLOCKED) == 0) {
-				list.add(nodes[curr_x + 1][curr_y]);
+				(getNode(curr_x, curr_y).flag & WALL_EAST) == 0 &&
+				(getNode(curr_x + 1, curr_y).flag & BLOCKED) == 0) {
+				list.add(getNode(curr_x + 1, curr_y));
 			}
 			if (curr_x > 0 && curr_y > 0 &&
-					(nodes[curr_x][curr_y].flag & (WALL_SOUTHWEST | WALL_SOUTH | WALL_WEST)) == 0 &&
-					(nodes[curr_x - 1][curr_y - 1].flag & BLOCKED) == 0 &&
-					(nodes[curr_x][curr_y - 1].flag & (WALL_WEST | BLOCKED)) == 0 &&
-					(nodes[curr_x - 1][curr_y].flag & (WALL_SOUTH | BLOCKED)) == 0) {
-				list.add(nodes[curr_x - 1][curr_y - 1]);
+				(getNode(curr_x, curr_y).flag & (WALL_SOUTHWEST | WALL_SOUTH | WALL_WEST)) == 0 &&
+				(getNode(curr_x - 1, curr_y - 1).flag & BLOCKED) == 0 &&
+				(getNode(curr_x, curr_y - 1).flag & (WALL_WEST | BLOCKED)) == 0 &&
+				(getNode(curr_x - 1, curr_y).flag & (WALL_SOUTH | BLOCKED)) == 0) {
+				list.add(getNode(curr_x - 1, curr_y - 1));
 			}
 			if (curr_x > 0 && curr_y < height - 1 &&
-					(nodes[curr_x][curr_y].flag & (WALL_NORTHWEST | WALL_NORTH | WALL_WEST)) == 0 &&
-					(nodes[curr_x - 1][curr_y + 1].flag & BLOCKED) == 0 &&
-					(nodes[curr_x][curr_y + 1].flag & (WALL_WEST | BLOCKED)) == 0 &&
-					(nodes[curr_x - 1][curr_y].flag & (WALL_NORTH | BLOCKED)) == 0) {
-				list.add(nodes[curr_x - 1][curr_y + 1]);
+				(getNode(curr_x, curr_y).flag & (WALL_NORTHWEST | WALL_NORTH | WALL_WEST)) == 0 &&
+				(getNode(curr_x - 1, curr_y + 1).flag & BLOCKED) == 0 &&
+				(getNode(curr_x, curr_y + 1).flag & (WALL_WEST | BLOCKED)) == 0 &&
+				(getNode(curr_x - 1, curr_y).flag & (WALL_NORTH | BLOCKED)) == 0) {
+				list.add(getNode(curr_x - 1, curr_y + 1));
 			}
 			if (curr_x < height - 1 && curr_y > 0 &&
-					(nodes[curr_x][curr_y].flag & (WALL_SOUTHEAST | WALL_SOUTH | WALL_EAST)) == 0 &&
-					(nodes[curr_x + 1][curr_y - 1].flag & BLOCKED) == 0 &&
-					(nodes[curr_x][curr_y - 1].flag & (WALL_EAST | BLOCKED)) == 0 &&
-					(nodes[curr_x + 1][curr_y].flag & (WALL_SOUTH | BLOCKED)) == 0) {
-				list.add(nodes[curr_x + 1][curr_y - 1]);
+				(getNode(curr_x, curr_y).flag & (WALL_SOUTHEAST | WALL_SOUTH | WALL_EAST)) == 0 &&
+				(getNode(curr_x + 1, curr_y - 1).flag & BLOCKED) == 0 &&
+				(getNode(curr_x, curr_y - 1).flag & (WALL_EAST | BLOCKED)) == 0 &&
+				(getNode(curr_x + 1, curr_y).flag & (WALL_SOUTH | BLOCKED)) == 0) {
+				list.add(getNode(curr_x + 1, curr_y - 1));
 			}
 			if (curr_x < width - 1 && curr_y < height - 1 &&
-					(nodes[curr_x][curr_y].flag & (WALL_NORTHEAST | WALL_NORTH | WALL_EAST)) == 0 &&
-					(nodes[curr_x + 1][curr_y + 1].flag & BLOCKED) == 0 &&
-					(nodes[curr_x][curr_y + 1].flag & (WALL_EAST | BLOCKED)) == 0 &&
-					(nodes[curr_x + 1][curr_y].flag & (WALL_NORTH | BLOCKED)) == 0) {
-				list.add(nodes[curr_x + 1][curr_y + 1]);
+				(getNode(curr_x, curr_y).flag & (WALL_NORTHEAST | WALL_NORTH | WALL_EAST)) == 0 &&
+				(getNode(curr_x + 1, curr_y + 1).flag & BLOCKED) == 0 &&
+				(getNode(curr_x, curr_y + 1).flag & (WALL_EAST | BLOCKED)) == 0 &&
+				(getNode(curr_x + 1, curr_y).flag & (WALL_NORTH | BLOCKED)) == 0) {
+				list.add(getNode(curr_x + 1, curr_y + 1));
 			}
 			return list;
 		}
 	}
 
 	static final class Node {
+
 		public final int x, y;
 		public final int flag;
-		private boolean opened, closed;
-		private Node parent;
-		private double f, g, h;
+		private Node parent = null;
+		private int g = Integer.MAX_VALUE;
 
 		private Node(final int x, final int y, final int flag) {
 			this.x = x;
 			this.y = y;
 			this.flag = flag;
-			reset();
-		}
-
-		private void reset() {
-			opened = closed = false;
-			parent = null;
-			f = g = h = Double.POSITIVE_INFINITY;
 		}
 
 		@Override

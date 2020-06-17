@@ -207,15 +207,15 @@ public class Model {
 	}
 
 	public void scale(final int scaleX, final int scaleY, final int scaleZ) {
-		for (int i = 0; i < this.verticesX.length; ++i) {
-			this.verticesX[i] = scaleX * this.verticesX[i] / 128;
-			this.verticesY[i] = scaleY * this.verticesY[i] / 128;
-			this.verticesZ[i] = scaleZ * this.verticesZ[i] / 128;
+		for (int i = 0; i < verticesX.length; ++i) {
+			verticesX[i] = scaleX * verticesX[i] / 128;
+			verticesY[i] = scaleY * verticesY[i] / 128;
+			verticesZ[i] = scaleZ * verticesZ[i] / 128;
 		}
 		save();
 	}
 
-	public void offsetVertices(int xOff, int yOff, int zOff) {
+	public void offsetVertices(final int xOff, final int yOff, final int zOff) {
 		for (int i = 0; i < verticesX.length; i++) {
 			verticesX[i] += xOff;
 			verticesY[i] += yOff;
@@ -236,7 +236,6 @@ public class Model {
 		this.verticesX = originalVerticesX;
 		this.verticesZ = originalVerticesZ;
 	}
-
 
 	public int[] verticesX() {
 		return verticesX;

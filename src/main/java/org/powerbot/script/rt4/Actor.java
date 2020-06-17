@@ -420,5 +420,4 @@ public abstract class Actor extends Interactive implements InteractiveEntity, Na
 		final org.powerbot.bot.rt4.client.Actor actor = getActor();
 		return actor != null ? actor.getOrientation() : -1;
 	}
-
 }
