@@ -1,5 +1,6 @@
 package org.powerbot.script.rt4;
 
+import org.powerbot.script.Random;
 import org.powerbot.script.Vector3;
 
 import java.awt.*;
@@ -33,7 +34,10 @@ public class Model {
 		this.indicesX = indicesX;
 		this.indicesY = indicesY;
 		this.indicesZ = indicesZ;
+		save();
+	}
 
+	private void save() {
 		this.originalVerticesX = verticesX.clone();
 		this.originalVerticesZ = verticesZ.clone();
 		this.originalIndicesX = indicesX.clone();
@@ -67,7 +71,7 @@ public class Model {
 		final int[] vertY = verticesY();
 		final int[] vertZ = verticesZ();
 
-		final java.util.List<Polygon> polys = new ArrayList<>();
+		final List<Polygon> polys = new ArrayList<>();
 		final boolean resizable = ctx.game.resizable();
 		for (int i = 0; i < indX.length; i++) {
 			if (i >= indY.length && i >= indZ.length) {
@@ -94,12 +98,41 @@ public class Model {
 	 * @param localX the local x of the entity
 	 * @param localY the local y of the entity
 	 * @param orientation the orientation of the entity
-	 * @param graphics graphics object to draw with
+	 * @param g graphics object to draw with
 	 */
-	public void draw(final int localX, final int localY, final int orientation, final Graphics graphics) {
+	public void draw(final int localX, final int localY, final int orientation, final Graphics g) {
 		for (final Polygon polygon : polygons(localX, localY, orientation)) {
-			graphics.drawPolygon(polygon);
+			g.drawPolygon(polygon);
 		}
+	}
+
+	public Point nextPoint(final int localX, final int localY, final int orientation) {
+		final List<Polygon> polygons = polygons(localX, localY, orientation);
+		if (polygons == null || polygons.isEmpty()) {
+			return new Point(-1, -1);
+		}
+
+		// Select random triangle of model
+		final Polygon triangle = polygons.get(Random.nextInt(0, polygons.size() - 1));
+		final Point[] pts = {
+			new Point(triangle.xpoints[0], triangle.ypoints[0]),
+			new Point(triangle.xpoints[1], triangle.ypoints[1]),
+			new Point(triangle.xpoints[2], triangle.ypoints[2])
+		};
+
+		// Compute random point within triangle
+		final double r1 = Math.random(), r2 = Math.random();
+		final double sqrtR1 = Math.sqrt(r1);
+		final double sqrtR1R2 = sqrtR1 * r2;
+		final double x = (1 - sqrtR1) * pts[0].x + (sqrtR1 * (1 - r2)) * pts[1].x + sqrtR1R2 * pts[2].x;
+		final double y = (1 - sqrtR1) * pts[0].y + (sqrtR1 * (1 - r2)) * pts[1].y + sqrtR1R2 * pts[2].y;
+
+		return new Point((int) x, (int) y);
+	}
+
+	public boolean contains(final Point point, final int localX, final int localY, final int orientation) {
+		final List<Polygon> polygons = polygons(localX, localY, orientation);
+		return polygons != null && !polygons.isEmpty() && polygons.stream().anyMatch(polygon -> polygon.contains(point));
 	}
 
 	private void setOrientation(final int orientation) {
@@ -108,7 +141,6 @@ public class Model {
 		for (int i = 0; i < originalVerticesX.length; ++i) {
 			verticesX[i] = originalVerticesX[i] * cos + originalVerticesZ[i] * sin >> 16;
 			verticesZ[i] = originalVerticesZ[i] * cos - originalVerticesX[i] * sin >> 16;
-
 		}
 	}
 
@@ -174,6 +206,24 @@ public class Model {
 		}
 	}
 
+	public void scale(final int scaleX, final int scaleY, final int scaleZ) {
+		for (int i = 0; i < verticesX.length; ++i) {
+			verticesX[i] = scaleX * verticesX[i] / 128;
+			verticesY[i] = scaleY * verticesY[i] / 128;
+			verticesZ[i] = scaleZ * verticesZ[i] / 128;
+		}
+		save();
+	}
+
+	public void offsetVertices(final int xOff, final int yOff, final int zOff) {
+		for (int i = 0; i < verticesX.length; i++) {
+			verticesX[i] += xOff;
+			verticesY[i] += yOff;
+			verticesZ[i] += zOff;
+		}
+		save();
+	}
+
 	public void rotate(final int num) {
 		for (int n = 0; n < num; n++) {
 			for (int i = 0; i < originalVerticesX.length; ++i) {
@@ -186,7 +236,6 @@ public class Model {
 		this.verticesX = originalVerticesX;
 		this.verticesZ = originalVerticesZ;
 	}
-
 
 	public int[] verticesX() {
 		return verticesX;
