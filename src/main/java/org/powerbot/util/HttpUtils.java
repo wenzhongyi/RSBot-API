@@ -24,7 +24,9 @@ public class HttpUtils {
 		final StringBuilder s = new StringBuilder(60);
 
 		final Script.Manifest app = ContextClassLoader.class.getAnnotation(Script.Manifest.class);
-		s.append(app.name()).append('/').append(app.version()).append(" (");
+		s.append(app.name()).append('/');
+		final String v = HttpUtils.class.getPackage().getSpecificationVersion();
+		s.append(v == null ? "-" : v).append(" (");
 		final String os = System.getProperty("os.name", "");
 		if (os.contains("Mac")) {
 			s.append("Macintosh; Intel ").append(System.getProperty("os.name")).append(' ').append(System.getProperty("os.version").replace('.', '_'));

@@ -12,9 +12,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DrawObjects extends ClientAccessor implements PaintListener {
 	private static final Color[] C = {Color.GREEN, Color.WHITE, Color.BLACK, Color.BLUE, Color.PINK};
+	private final GameObject.Type type;
 
-	public DrawObjects(final ClientContext ctx) {
+	protected DrawObjects(final ClientContext ctx, final GameObject.Type type) {
 		super(ctx);
+		this.type = type;
 	}
 
 	@Override
@@ -30,7 +32,7 @@ public class DrawObjects extends ClientAccessor implements PaintListener {
 		final int textHeight = metrics.getHeight();
 
 		final Map<Tile, AtomicInteger> counts = new HashMap<>();
-		for (final GameObject object : ctx.objects.select(8)) {
+		for (final GameObject object : ctx.objects.select(8).select(o -> o.type() == type)) {
 			final Tile t = object.tile();
 			if (t == null) {
 				continue;
@@ -42,6 +44,9 @@ public class DrawObjects extends ClientAccessor implements PaintListener {
 			if (p.x == -1) {
 				continue;
 			}
+
+			render.setColor(Color.ORANGE);
+			object.drawModel(render);
 
 			render.setColor(Color.black);
 			render.fillRect(p.x - 1, p.y - 1, 2, 2);

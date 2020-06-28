@@ -19,6 +19,7 @@ public abstract class Path extends ClientAccessor implements Validatable {
 	public static final int OBJECT_TILE = 0x100;
 	public static final int DECORATION_BLOCK = 0x40000;
 	public static final int OBJECT_BLOCK = 0x200000;
+	public static final int BLOCKED = OBJECT_TILE | OBJECT_BLOCK | DECORATION_BLOCK;
 
 	Path(final ClientContext ctx) {
 		super(ctx);

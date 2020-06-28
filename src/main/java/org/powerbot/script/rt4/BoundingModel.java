@@ -57,7 +57,6 @@ public abstract class BoundingModel extends ClientAccessor {
 		return point != null ? point : (point = firstInViewportCentroid(triangles, 0, mark)) != null ? point : new Point(-1, -1);
 	}
 
-
 	public Point centerPoint() {
 		final int[][][] triangles = project();
 		final int faces = triangles.length;

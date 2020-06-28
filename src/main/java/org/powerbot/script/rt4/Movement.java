@@ -205,7 +205,7 @@ public class Movement extends ClientAccessor {
 		if (graph != null &&
 				(nodeStart = graph.getNode(t1.x(), t1.y())) != null &&
 				(nodeStop = graph.getNode(t2.x(), t2.y())) != null) {
-			LocalPath.dijkstra(graph, nodeStart, nodeStop);
+			LocalPath.bfs(graph, nodeStart, nodeStop);
 			path = LocalPath.follow(nodeStop);
 		} else {
 			path = new LocalPath.Node[0];

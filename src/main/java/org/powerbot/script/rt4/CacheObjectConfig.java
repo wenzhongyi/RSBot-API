@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class CacheObjectConfig {
 	public final int index;
-	private final JagexStream stream;
+	private final JagexBufferStream stream;
 	public String name = "null";
 	public final String[] actions = new String[5];
 	public int xSize = 1;
@@ -34,7 +34,7 @@ public class CacheObjectConfig {
 
 	CacheObjectConfig(final Block.Sector sector, final int index) {
 		this.index = index;
-		stream = new JagexStream(sector.getPayload());
+		stream = new JagexBufferStream(sector.getPayload());
 		read();
 	}
 

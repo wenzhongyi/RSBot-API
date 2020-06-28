@@ -14,13 +14,13 @@ import static org.powerbot.script.rt4.Constants.*;
  * A utility class used for interacting with game tabs, retrieving miscellaneous game values, and converting points to the viewport.
  */
 public class Game extends ClientAccessor {
-	private static final int[] ARRAY_SIN = new int[2048];
-	private static final int[] ARRAY_COS = new int[2048];
+	public static final int[] ARRAY_SIN = new int[16384];
+	public static final int[] ARRAY_COS = new int[16384];
 
 	public Settings settings;
 
 	static {
-		for (int i = 0; i < 2048; i++) {
+		for (int i = 0; i < 16384; i++) {
 			ARRAY_SIN[i] = (int) (65536d * Math.sin(i * 0.0030679615d));
 			ARRAY_COS[i] = (int) (65536d * Math.cos(i * 0.0030679615d));
 		}
@@ -245,7 +245,18 @@ public class Game extends ClientAccessor {
 	 * @return {@code true} if it is within bounds, {@code false} otherwise.
 	 */
 	public boolean inViewport(final Point p) {
-		return pointInViewport(p.x, p.y);
+		return inViewport(p, resizable());
+	}
+
+	/**
+	 * Whether or not the 2-dimension point is within the viewport of the applet.
+	 *
+	 * @param p The 2-dimensional point to check.
+	 * @param resizable true if in resizable mode
+	 * @return {@code true} if it is within bounds, {@code false} otherwise.
+	 */
+	public boolean inViewport(final Point p, final boolean resizable) {
+		return pointInViewport(p.x, p.y, resizable);
 	}
 
 	/**
@@ -274,11 +285,23 @@ public class Game extends ClientAccessor {
 	 * @return {@code true} if it is within bounds, {@code false} otherwise.
 	 */
 	public boolean pointInViewport(final int x, final int y) {
-		if (resizable()) {
+		return pointInViewport(x, y, resizable());
+	}
+
+	/**
+	 * Whether or not the 2-dimension point is within the viewport of the applet.
+	 *
+	 * @param x The x-axis value
+	 * @param y The y-axis value
+	 * @param resizable true if client is resizable
+	 * @return {@code true} if it is within bounds, {@code false} otherwise.
+	 */
+	public boolean pointInViewport(final int x, final int y, final boolean resizable) {
+		if (resizable) {
 			final Dimension d = dimensions();
 			return x >= 0 && y >= 0 && (x > 520 || y <= d.height - 170) &&
-					(x < d.width - 245 || y < d.height - 340 && y > 170) &&
-					x <= (d.width - 1) && y <= (d.height - 1);
+				(x < d.width - 245 || y < d.height - 340 && y > 170) &&
+				x <= (d.width - 1) && y <= (d.height - 1);
 		}
 		return x >= 4 && y >= 4 && x <= 515 && y <= 337;
 	}
@@ -367,7 +390,15 @@ public class Game extends ClientAccessor {
 		if (client == null) {
 			return new Point(-1, -1);
 		}
-		return worldToScreen(relativeX, tileHeight(relativeX, relativeZ), relativeZ, h);
+		return worldToScreen(relativeX, relativeZ, h, resizable());
+	}
+
+	public Point worldToScreen(final int relativeX, final int relativeZ, final int h, final boolean resizable) {
+		final Client client = ctx.client();
+		if (client == null) {
+			return new Point(-1, -1);
+		}
+		return worldToScreen(relativeX, tileHeight(relativeX, relativeZ), relativeZ, h, resizable);
 	}
 
 	/**
@@ -382,10 +413,30 @@ public class Game extends ClientAccessor {
 	 * @return The 2-dimensional point on screen.
 	 */
 	public Point worldToScreen(final int relativeX, final int relativeY, final int relativeZ, final int h) {
+		return worldToScreen(relativeX, relativeY, relativeZ, h, resizable());
+	}
+
+	/**
+	 * Converts a 3-dimensional point within the overworld to a 2-dimensional point on the
+	 * screen. The 3-dimensional axis is flipped to represent the X axis being horizontal,
+	 * Y axis being vertical, and Z axis to be depth.
+	 *
+	 * @param relativeX The x-axis value relative to the origin
+	 * @param relativeY The y-axis value relative to the origin
+	 * @param relativeZ The z-axis value relative to the origin
+	 * @param h         The y-axis value, otherwise known as height
+	 * @param resizable true if the client is in resizable mode
+	 * @return The 2-dimensional point on screen.
+	 */
+	public Point worldToScreen(final int relativeX, final int relativeY, final int relativeZ, final int h, final boolean resizable) {
 		final Client client = ctx.client();
 		final Point r = new Point(-1, -1);
+		if (client == null) {
+			return r;
+		}
+
 		if (relativeX < 128 || relativeX > 13056 ||
-				relativeZ < 128 || relativeZ > 13056) {
+			relativeZ < 128 || relativeZ > 13056) {
 			return r;
 		}
 		final int floor = client.getFloor();
@@ -394,7 +445,7 @@ public class Game extends ClientAccessor {
 		}
 		final int height = relativeY - h;
 		final int projectedX = relativeX - client.getCameraX(), projectedZ = relativeZ - client.getCameraZ(),
-				projectedY = height - client.getCameraY();
+			projectedY = height - client.getCameraY();
 		final int pitch = client.getCameraPitch(), yaw = client.getCameraYaw();
 		final int[] c = {ARRAY_SIN[yaw], ARRAY_COS[yaw], ARRAY_SIN[pitch], ARRAY_COS[pitch]};
 		final int rotatedX = c[0] * projectedZ + c[1] * projectedX >> 16;
@@ -403,15 +454,15 @@ public class Game extends ClientAccessor {
 		final int rolledZ = c[3] * rotatedZ + c[2] * projectedY >> 16;
 		if (rolledZ >= 50) {
 			int mx = 256, my = 167;
-			if (ctx.widgets.widget(Constants.VIEWPORT_WIDGET >> 16).component(Constants.VIEWPORT_WIDGET & 0xffff).screenPoint().x != 4) {
+			if (resizable) {
 				final Dimension d = dimensions();
 				mx = d.width / 2;
 				my = d.height / 2;
 			}
 			final int proj = client.getTileSize();
 			return new Point(
-					(rotatedX * proj) / rolledZ + mx,
-					(rolledY * proj) / rolledZ + my
+				(rotatedX * proj) / rolledZ + mx,
+				(rolledY * proj) / rolledZ + my
 			);
 		}
 		return r;
