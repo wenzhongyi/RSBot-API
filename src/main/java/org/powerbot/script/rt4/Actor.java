@@ -151,6 +151,10 @@ public abstract class Actor extends Interactive implements InteractiveEntity, Na
 		if (data == null || data[1] == null) {
 			return 100;
 		}
+		if (getBarComponent() == null) {
+			return 100;
+		}
+
 		return (int) Math.ceil(data[1].getHealthRatio() * 100d / getBarComponent().getWidth());
 	}
 
@@ -209,7 +213,7 @@ public abstract class Actor extends Interactive implements InteractiveEntity, Na
 				return new Player(ctx, client.getPlayer());
 			}
 			final org.powerbot.bot.rt4.client.Player[] players = client.getPlayers();
-			return pos >= 0 && pos < players.length ? new Player(ctx, players[pos]) : nil;
+			return pos < players.length ? new Player(ctx, players[pos]) : nil;
 		}
 	}
 
@@ -342,15 +346,13 @@ public abstract class Actor extends Interactive implements InteractiveEntity, Na
 		if (nodes == null || client == null) {
 			return null;
 		}
-		final CombatStatusData[] data = new CombatStatusData[nodes.length];
-		for (int i = 0; i < nodes.length; i++) {
-			if (nodes[i] == null || nodes[i].isNull() ||
-					!nodes[i].isTypeOf(CombatStatus.class)) {
-				data[i] = null;
+		for (Node node : nodes) {
+			if (node == null || node.isNull() ||
+				!node.isTypeOf(CombatStatus.class)) {
 				continue;
 			}
-			final CombatStatus status = new CombatStatus(nodes[i].reflector, nodes[i]);
-			final org.powerbot.bot.rt4.client.BarComponent barComponent;
+			final CombatStatus status = new CombatStatus(node.reflector, node);
+			final BarComponent barComponent;
 			try {
 				barComponent = status.getBarComponent();
 				return barComponent;

@@ -178,7 +178,7 @@ public class Game extends ClientAccessor {
 	 * @return The dimensions of the applet.
 	 */
 	public Dimension dimensions() {
-		final Applet applet = ctx.bot().getApplet();
+		@SuppressWarnings("deprecation") final Applet applet = ctx.bot().getApplet();
 		return applet != null ? new Dimension(applet.getWidth(), applet.getHeight()) : new Dimension(-1, -1);
 	}
 

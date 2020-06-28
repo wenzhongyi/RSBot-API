@@ -75,6 +75,7 @@ public class Widgets extends IdQuery<Widget> {
 	 * @return an array of {@link Widget}s which are currently loaded
 	 * @deprecated use queries
 	 */
+	@Deprecated
 	public Widget[] array() {
 		final List<Widget> w = get();
 		return w.toArray(new Widget[0]);
@@ -89,6 +90,7 @@ public class Widgets extends IdQuery<Widget> {
 	 * @return {@code true} if scrolled to view, otherwise {@code false}
 	 * @deprecated use {@link #scroll(Component, Component, Component, boolean) scroll(component, pane, bar, scroll)}
 	 */
+	@Deprecated
 	public boolean scroll(final Component pane, final Component component, final Component bar) {
 		return scroll(component, pane, bar, true);
 	}

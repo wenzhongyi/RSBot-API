@@ -83,8 +83,12 @@ public class ScriptBundle {
 
 		@Override
 		public int compareTo(final Definition o) {
+			if (o == null) {
+				return 0;
+			}
+
 			final String a = getID(), b = o.getID();
-			return a == null || b == null ? 0 : a.compareTo(b);
+			return a.compareTo(b);
 		}
 	}
 

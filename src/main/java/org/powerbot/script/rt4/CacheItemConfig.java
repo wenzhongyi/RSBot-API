@@ -128,11 +128,9 @@ public class CacheItemConfig implements Validatable {
 				}
 			} else if (opcode == 41) {
 				final int size = stream.getUByte();
-				final int[] arr1 = new int[size];
-				final int[] arr2 = new int[size];
 				for (int o = 0; o < size; o++) {
-					arr1[o] = stream.getUShort();
-					arr2[o] = stream.getUShort();
+					stream.getUShort();
+					stream.getUShort();
 				}
 			} else if (opcode == 42) {
 				this.shiftActionIndex = stream.getByte();
