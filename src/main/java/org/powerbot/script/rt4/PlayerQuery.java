@@ -2,7 +2,6 @@ package org.powerbot.script.rt4;
 
 import org.powerbot.script.*;
 
-import java.util.Collection;
 import java.util.regex.Pattern;
 
 /**
@@ -76,39 +75,7 @@ public abstract class PlayerQuery<K extends Locatable & Nameable & Viewable> ext
 	 * {@inheritDoc}
 	 */
 	@Override
-	public PlayerQuery<K> name(final String... names) {
-		return select(new Nameable.Matcher(names));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public PlayerQuery<K> name(final Collection<String> names) {
-		return select(new Nameable.Matcher(names));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public PlayerQuery<K> name(final String[]... names) {
-		return select(new Nameable.Matcher(names));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public PlayerQuery<K> name(final Pattern... names) {
-		return select(new Nameable.Matcher(names));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public PlayerQuery<K> name(final Nameable... names) {
 		return select(new Nameable.Matcher(names));
 	}
 

@@ -28,7 +28,13 @@ public interface Actionable extends Interactive {
 		 * @param actions the valid actions
 		 * @return {@code this} for the purpose of method chaining
 		 */
-		T action(String... actions);
+		default T action(final String... actions) {
+			final Pattern[] a = new Pattern[actions.length];
+			for (int i = 0; i < actions.length; i++) {
+				a[i] = Pattern.compile(Pattern.quote(actions[i]), Pattern.CASE_INSENSITIVE);
+			}
+			return action(a);
+		}
 
 		/**
 		 * Selects the entities which have one of the specified actions into the query cache.
@@ -36,7 +42,9 @@ public interface Actionable extends Interactive {
 		 * @param actions the valid actions
 		 * @return {@code this} for the purpose of method chaining
 		 */
-		T action(Collection<String> actions);
+		default T action(final Collection<String> actions) {
+			return action(actions.toArray(new String[0]));
+		}
 
 		/**
 		 * Selects the entities which have any action which matches one of the specified action patterns into the query cache.
@@ -51,57 +59,25 @@ public interface Actionable extends Interactive {
 	 * Matcher
 	 */
 	class Matcher implements Filter<Actionable> {
-		private final String[] str;
 		private final Pattern[] regex;
-
-		public Matcher(final String... actions) {
-			str = actions;
-			regex = null;
-		}
-
-		public Matcher(final Collection<String> actions) {
-			regex = null;
-			str = new String[actions.size()];
-			int i = 0;
-			for (final String s : actions) {
-				str[i++] = s;
-			}
-		}
 
 		public Matcher(final Pattern... actions) {
 			regex = actions;
-			str = null;
 		}
 
 		@Override
 		public boolean accept(final Actionable actionable) {
 			final String[] actions = actionable.actions();
-			if (actions == null) {
+			if (actions == null || regex == null) {
 				return false;
 			}
-			if (regex == null && str == null) {
-				return false;
-			}
-			if (regex != null) {
-				for (final String action : actions) {
-					if (action == null) {
-						continue;
-					}
-					for (final Pattern pattern : regex) {
-						if (pattern.matcher(action).matches()) {
-							return true;
-						}
-					}
+			for (final String action : actions) {
+				if (action == null) {
+					continue;
 				}
-			} else {
-				for (final String action : actions) {
-					if (action == null) {
-						continue;
-					}
-					for (final String string : str) {
-						if (action.equalsIgnoreCase(string)) {
-							return true;
-						}
+				for (final Pattern pattern : regex) {
+					if (pattern.matcher(action).matches()) {
+						return true;
 					}
 				}
 			}

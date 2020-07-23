@@ -33,7 +33,19 @@ public interface Identifiable {
 		 * @param ids the valid id arrays to check
 		 * @return {@code this} for the purpose of method chaining
 		 */
-		T id(int[]... ids);
+		default T id(final int[]... ids) {
+			int l = 0, i = 0;
+			for (final int[] e : ids) {
+				l += e.length;
+			}
+			final int[] a = new int[l];
+			for (final int[] e : ids) {
+				for (final int x : e) {
+					a[i++] = x;
+				}
+			}
+			return id(a);
+		}
 
 		/**
 		 * Selects the entities which have one of the provided ids into the query cache.
@@ -41,7 +53,13 @@ public interface Identifiable {
 		 * @param ids the valid identifiables to check their ids against
 		 * @return {@code this} for the purpose of method chaining
 		 */
-		T id(Identifiable... ids);
+		default T id(final Identifiable... ids) {
+			final int[] a = new int[ids.length];
+			for (int i = 0; i < ids.length; i++) {
+				a[i] = ids[i].id();
+			}
+			return id(a);
+		}
 	}
 
 	/**
@@ -52,13 +70,6 @@ public interface Identifiable {
 
 		public Matcher(final int... ids) {
 			this.ids = ids;
-		}
-
-		public Matcher(final Identifiable... ids) {
-			this.ids = new int[ids.length];
-			for (int i = 0; i < ids.length; i++) {
-				this.ids[i] = ids[i].id();
-			}
 		}
 
 		@Override

@@ -160,29 +160,4 @@ public class Worlds extends AbstractQuery<Worlds, World, ClientContext> implemen
 	public Worlds id(final int... ids) {
 		return select(new Identifiable.Matcher(ids));
 	}
-
-	@Override
-	public Worlds id(final int[]... ids) {
-		int z = 0;
-
-		for (final int[] x : ids) {
-			z += x.length;
-		}
-
-		final int[] a = new int[z];
-		int i = 0;
-
-		for (final int[] x : ids) {
-			for (final int y : x) {
-				a[i++] = y;
-			}
-		}
-
-		return select(new Identifiable.Matcher(a));
-	}
-
-	@Override
-	public Worlds id(final Identifiable... ids) {
-		return select(new Identifiable.Matcher(ids));
-	}
 }

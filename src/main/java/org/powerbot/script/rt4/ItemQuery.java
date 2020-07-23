@@ -2,7 +2,6 @@ package org.powerbot.script.rt4;
 
 import org.powerbot.script.*;
 
-import java.util.Collection;
 import java.util.regex.Pattern;
 
 /**
@@ -36,87 +35,8 @@ public abstract class ItemQuery<K extends Identifiable & Nameable & Stackable & 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ItemQuery<K> id(final int[]... ids) {
-		int z = 0;
-
-		for (final int[] x : ids) {
-			z += x.length;
-		}
-
-		final int[] a = new int[z];
-		int i = 0;
-
-		for (final int[] x : ids) {
-			for (final int y : x) {
-				a[i++] = y;
-			}
-		}
-
-		return select(new Identifiable.Matcher(a));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ItemQuery<K> id(final Identifiable... identifiables) {
-		return select(new Identifiable.Matcher(identifiables));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ItemQuery<K> name(final String... names) {
-		return select(new Nameable.Matcher(names));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ItemQuery<K> name(final Collection<String> names) {
-		return select(new Nameable.Matcher(names));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ItemQuery<K> name(final String[]... names) {
-		return select(new Nameable.Matcher(names));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public ItemQuery<K> name(final Pattern... names) {
 		return select(new Nameable.Matcher(names));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ItemQuery<K> name(final Nameable... names) {
-		return select(new Nameable.Matcher(names));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ItemQuery<K> action(final String... actions) {
-		return select(new Actionable.Matcher(actions));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ItemQuery<K> action(final Collection<String> actions) {
-		return select(new Actionable.Matcher(actions));
 	}
 
 	/**
