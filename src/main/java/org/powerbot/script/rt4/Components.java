@@ -77,7 +77,7 @@ public class Components extends AbstractQuery<Components, Component, ClientConte
 
 
 	@Override
-	protected List<Component> get() {
+	public List<Component> get() {
 		return get(true, ctx.widgets.select());
 	}
 

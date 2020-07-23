@@ -26,7 +26,7 @@ public class Chat extends TextQuery<ChatOption> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected List<ChatOption> get() {
+	public List<ChatOption> get() {
 		final List<ChatOption> options = new ArrayList<>(5);
 		final Component parent = ctx.widgets.component(Constants.CHAT_WIDGET, 1);
 		for (int i = 0; i < 5; i++) {

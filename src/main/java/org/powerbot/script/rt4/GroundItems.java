@@ -21,6 +21,9 @@ public class GroundItems extends BasicQuery<GroundItem> {
 		return select(get(radius, client != null ? client.getFloor() : -1));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<GroundItem> get() {
 		final Client client = ctx.client();

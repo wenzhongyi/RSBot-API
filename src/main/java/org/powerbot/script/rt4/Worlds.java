@@ -26,8 +26,11 @@ public class Worlds extends AbstractQuery<Worlds, World, ClientContext> implemen
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	protected List<World> get() {
+	public List<World> get() {
 		final ArrayList<World> worlds = new ArrayList<>();
 		final Component list = list();
 		if (!list.valid()) {

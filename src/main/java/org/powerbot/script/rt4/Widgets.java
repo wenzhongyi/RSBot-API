@@ -58,7 +58,7 @@ public class Widgets extends IdQuery<Widget> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected List<Widget> get() {
+	public List<Widget> get() {
 		final Client client = ctx.client();
 		final org.powerbot.bot.rt4.client.Widget[][] a = client != null ? client.getWidgets() : null;
 		final int len = a != null ? a.length : 0;

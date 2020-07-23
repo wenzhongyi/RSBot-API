@@ -15,8 +15,11 @@ public class Inventory extends ItemQuery<Item> {
 		super(ctx);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	protected List<Item> get() {
+	public List<Item> get() {
 		final List<Item> items = new ArrayList<>(Constants.INVENTORY_SIZE);
 		final Component comp = component();
 		if (comp.componentCount() > 0) {

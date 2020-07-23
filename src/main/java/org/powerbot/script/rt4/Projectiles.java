@@ -22,7 +22,7 @@ public class Projectiles extends IdQuery<org.powerbot.script.rt4.Projectile> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected List<org.powerbot.script.rt4.Projectile> get() {
+	public List<org.powerbot.script.rt4.Projectile> get() {
 		final List<org.powerbot.script.rt4.Projectile> items = new ArrayList<>();
 
 		final Client client = ctx.client();

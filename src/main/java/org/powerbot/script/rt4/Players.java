@@ -13,6 +13,9 @@ public class Players extends PlayerQuery<Player> {
 		super(ctx);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<Player> get() {
 		final List<Player> r = new CopyOnWriteArrayList<>();

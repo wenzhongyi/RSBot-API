@@ -13,6 +13,9 @@ public class Npcs extends BasicQuery<Npc> {
 		super(ctx);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<Npc> get() {
 		final List<Npc> r = new ArrayList<>();
