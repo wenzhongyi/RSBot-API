@@ -45,13 +45,11 @@ public abstract class AbstractQuery<T extends AbstractQuery<T, K, C>, K, C exten
 	 * Returns a {@link Stream} with this collection as its source.
 	 *
 	 * @return a sequential {@link Stream} over the elements in this collection
+	 * @deprecated use {@link #get()} then {@link List#stream()}
 	 */
+	@Deprecated
 	public final Stream<K> stream() {
-		final Stream.Builder<K> s = Stream.builder();
-		for (final K k : items.get()) {
-			s.accept(k);
-		}
-		return s.build();
+		return get().stream();
 	}
 
 	/**
